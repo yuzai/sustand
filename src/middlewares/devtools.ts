@@ -29,6 +29,6 @@ const devtools: Devtools = (
 
 export default devtools;
 
-export {
+export type {
     DevtoolsOptions,
 };

@@ -10,9 +10,11 @@ specifiers:
   alias-jsconfig-webpack-plugin: ^1.0.2
   babel-loader: ^9.1.2
   html-webpack-plugin: ^5.5.0
+  immer: ^9.0.19
   path-browserify: ^1.0.1
   proxy-memoize: ^2.0.2
   react: ^18.2.0
+  react-dom: ^18.2.0
   typescript: ^4.9.5
   webpack: ^5.75.0
   webpack-cli: ^5.0.1
@@ -21,7 +23,7 @@ specifiers:
 
 dependencies:
   proxy-memoize: 2.0.2
-  zustand: 4.3.5_react@18.2.0
+  zustand: 4.3.5_immer@9.0.19+react@18.2.0
 
 devDependencies:
   '@babel/cli': 7.21.0_@babel+core@7.21.0
@@ -33,8 +35,10 @@ devDependencies:
   alias-jsconfig-webpack-plugin: 1.0.2
   babel-loader: 9.1.2_qoaxtqicpzj5p3ubthw53xafqm
   html-webpack-plugin: 5.5.0_webpack@5.75.0
+  immer: 9.0.19
   path-browserify: 1.0.1
   react: 18.2.0
+  react-dom: 18.2.0_react@18.2.0
   typescript: 4.9.5
   webpack: 5.75.0_webpack-cli@5.0.1
   webpack-cli: 5.0.1_uaydpeuxkjjcxdbyfgk36cjdxi
@@ -2661,6 +2665,9 @@ packages:
       safer-buffer: 2.1.2
     dev: true
 
+  /immer/9.0.19:
+    resolution: {integrity: sha512-eY+Y0qcsB4TZKwgQzLaE/lqYMlKhv5J9dyd2RhhtGhNo2njPXDqU9XPfcNfa3MIDsdtZt5KlkIsirlo4dHsWdQ==}
+
   /import-local/3.1.0:
     resolution: {integrity: sha512-ASB07uLtnDs1o6EHjKpX34BKYDSqnFerfTOJL2HvMqF70LnxpjkzDB8J44oT9pu4AMPkQwf8jl6szgvNd2tRIg==}
     engines: {node: '>=8'}
@@ -3199,6 +3206,16 @@ packages:
       unpipe: 1.0.0
     dev: true
 
+  /react-dom/18.2.0_react@18.2.0:
+    resolution: {integrity: sha512-6IMTriUmvsjHUjNtEDudZfuDQUoWXVxKHhlEGSk81n4YFS+r/Kl99wXiwlVXtPBtJenozv2P+hxDsw9eA7Xo6g==}
+    peerDependencies:
+      react: ^18.2.0
+    dependencies:
+      loose-envify: 1.4.0
+      react: 18.2.0
+      scheduler: 0.23.0
+    dev: true
+
   /react/18.2.0:
     resolution: {integrity: sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==}
     engines: {node: '>=0.10.0'}
@@ -3347,6 +3364,12 @@ packages:
 
   /safer-buffer/2.1.2:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
+    dev: true
+
+  /scheduler/0.23.0:
+    resolution: {integrity: sha512-CtuThmgHNg7zIZWAXi3AsyIzA3n4xx7aNyjwC2VJldO2LMVDhFK+63xGqq6CsJH4rTAt6/M+N4GhZiDYPx9eUw==}
+    dependencies:
+      loose-envify: 1.4.0
     dev: true
 
   /schema-utils/3.1.1:
@@ -3953,7 +3976,7 @@ packages:
     resolution: {integrity: sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g==}
     dev: true
 
-  /zustand/4.3.5_react@18.2.0:
+  /zustand/4.3.5_immer@9.0.19+react@18.2.0:
     resolution: {integrity: sha512-2iPUzfwx+g3f0PagOMz2vDO9mZzEp2puFpNe7vrAymVPOEIEUjCPkC4/zy84eAscxIWmTU4j9g6upXYkJdzEFQ==}
     engines: {node: '>=12.7.0'}
     peerDependencies:
@@ -3965,6 +3988,7 @@ packages:
       react:
         optional: true
     dependencies:
+      immer: 9.0.19
       react: 18.2.0
       use-sync-external-store: 1.2.0_react@18.2.0
     dev: false

@@ -1,4 +1,4 @@
-import create, { suspense, devtools, persist } from '../../es';
+import create, { suspense, devtools, persist } from 'sustand';
 import produce from 'immer';
 import { create as create2 } from 'zustand';
 // import { persist } from 'zustand/middleware';

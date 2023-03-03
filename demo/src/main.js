@@ -7,17 +7,15 @@ import T5 from './components/T5';
 import T6 from './components/T6';
 import T7 from './components/T7';
 
-import T1_1 from './components/store2/T1';
-import T2_1 from './components/store2/T2';
-// import T1_2 from './components/zustandstore/T1_2';
+import s from 'sustand';
+
+console.log(s);
 
 export default () => {
     const [state, setState] = useState(0);
     return (
         <div>
             <Suspense fallback={<div>loading</div>}>
-                <T1_1 />
-                <T2_1 />
             </Suspense>
             {/* <T1_2 /> */}
             {/* <T1 /> */}

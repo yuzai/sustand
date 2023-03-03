@@ -1,5 +1,15 @@
 {
   "compilerOptions": {
+    "baseUrl": "./",
+      "paths": {
+        "sustand": [
+          "src"
+        ],
+        "sustand/*": [
+          "src/*"
+        ]
+    },
+    "allowJs": true,
     "declaration": true,
     "emitDeclarationOnly": true,
     "alwaysStrict": true,

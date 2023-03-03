@@ -1,7 +1,7 @@
 import { persist as zustandPersist, PersistOptions } from 'zustand/middleware';
 import { SetState, GetState, StoreCreateApi } from '../types';
 
-export {
+export type {
     PersistOptions
 };
 

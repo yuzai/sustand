@@ -42,7 +42,8 @@ module.exports = {
         },
         extensions: ['.tsx', '.ts', '.jsx', '.js'],
         alias: {
-            sustand: path.resolve(__dirname, '../../src/')
+            sustand: path.resolve(__dirname, '../../src/'),
+            "@store": path.resolve(__dirname, '../src/store'),
         }
     },
 };

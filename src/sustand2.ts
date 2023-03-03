@@ -1,43 +1,14 @@
-/* eslint-disable */
 import { create } from 'zustand';
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { shallow } from 'zustand/shallow';
-import { memoize } from 'proxy-memoize';
-
-const collectMiddleWare = (func: (set: any, get: any, api: any) => any, computedCaches, suspenseCaches) => {
-    return (set, get, api) => {
-        const state = func(set, get, api);
-        Object.keys(state).forEach((key) => {
-            if (state[key] && state[key].sustand_internal_iscomputed) {
-                computedCaches[key] = {
-                    ...state[key],
-                    data: null,
-                    action: memoize(state[key].action || (() => null)),
-                }
-                state[key] = null;
-            }
-            if (state[key] && state[key].sustand_internal_issuspense) {
-                suspenseCaches[key] = {
-                    ...state[key],
-                    data: {},
-                    state: {},
-                }
-                state[key] = {};
-            }
-        });
-        Object.keys(computedCaches).forEach((key) => {
-            state[key] = computedCaches[key].action(state);
-        });
-        return state;
-    }
-}
+import collect from './utils/collet';
 
 const createSustand = (func: (set: any, get: any, api: any) => any) => {
     const computedCaches = {};
     const suspenseCaches = {};
     const lazySetActions = {};
 
-    const useZustandStore = create(collectMiddleWare(func, computedCaches, suspenseCaches));
+    const useZustandStore = create(collect(func, computedCaches, suspenseCaches));
 
     // 单独将 store 的方法导出
     const store = {
@@ -58,14 +29,15 @@ const createSustand = (func: (set: any, get: any, api: any) => any) => {
 
     const useStoreSuspense = (key, options:any = {}) => {
         const config = suspenseCaches[key];
-        const args = options.args;
-        const cacheKey = JSON.stringify(args);
+        const optionsRef = useRef(options);
+        optionsRef.current = options;
+        const cacheKey = JSON.stringify(optionsRef.current.args);
         const state = config.state;
 
         if (!state[cacheKey]) {
             state[cacheKey] = {
                 status: 'pending',
-                data: config.initialValue,
+                data: options.initialValue,
                 error: null,
                 cache: null,
                 refresh: () => {},
@@ -81,7 +53,7 @@ const createSustand = (func: (set: any, get: any, api: any) => any) => {
                 status: 'pending',
                 // data 不用覆盖，使用上一次即可
                 // error 不用覆盖,
-                cache: config.action(args).then((res) => {
+                cache: config.action(optionsRef.current.args).then((res) => {
                     state[cacheKey] = {
                         ...state[cacheKey],
                         status: 'fullfilled',
@@ -151,8 +123,6 @@ const createSustand = (func: (set: any, get: any, api: any) => any) => {
         useZustandStore((state) => ({
             status: state[key][cacheKey]?.status,
         }));
-
-        console.log(state[cacheKey].status)
 
         if (!state[cacheKey].cache) {
             throw createPromise();

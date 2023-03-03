@@ -7,6 +7,9 @@
         ],
         "sustand/*": [
           "src/*"
+        ],
+        "@store": [
+          "demo/src/store",
         ]
     },
     "allowJs": true,

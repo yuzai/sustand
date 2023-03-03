@@ -19,8 +19,8 @@ export default (
 ) : SuspenseData => ({
     action,
     selector: options.selector || null,
-    initialValue: options.initialValue || undefined,
     compare: options.compare || shallow,
+    initialValue: options.initialValue || undefined,
     data: {},
     sustand_internal_issuspense: true,
 });

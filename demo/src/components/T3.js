@@ -1,18 +1,17 @@
 import React from 'react';
-import { useStore } from '../store';
+import { useStore } from '@store';
 import { useRenderTimes } from '../hook';
 
 export default () => {
     const renderTimes = useRenderTimes();
-    const obj = useStore((state) => state.obj);
-    const setObj = useStore((state) => state.setObj);
+    const [countd, setCountD] = useStore((state) => [state.countd, state.setCountD]);
 
     return (
         <div>
             <h1>case3</h1>
             <p>component renderTimes: { renderTimes }</p>
-            <p>count: {JSON.stringify(obj)}</p>
-            <button onClick={() => setObj((pre) => ({a: pre.a + 1, b: 2}))}>{`setObj({a: 1, b: 2})`}</button>
+            <p>count: {countd}</p>
+            <button onClick={() => setCountD((pre) => (pre + 1))}>{`setCountD(pre => pre + 1)`}</button>
         </div>
     )
 }

@@ -3,6 +3,7 @@ import { SetState, GetState, StoreCreateApi } from '../types';
 
 const setMiddleware = (func) => (set, get, api) => {
     const originSetState = api.setState;
+    console.log(originSetState);
 
     // eslint-disable-next-line
     api.setState = (partial, desc: string) => {

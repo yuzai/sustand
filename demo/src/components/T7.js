@@ -10,7 +10,7 @@ export default () => {
     // console.log(gameInfo);
 
     return (
-        <div>
+        <div className="child">
             <h1>case7</h1>
             <p>component renderTimes: { renderTimes }</p>
             <p>count: {gameInfo.userA.baseInfo.gender}</p>

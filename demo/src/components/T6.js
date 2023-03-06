@@ -1,27 +1,23 @@
 import React, { useState } from 'react';
-import { useStore, useStoreSuspense } from '../store';
+import { useStore, useStoreSuspense } from '@store';
 import { useRenderTimes } from '../hook';
-
-// useRecoilValue()
-// Suspense. 
-// Loadable
-// Suspense -> Normal.
-
-// Suspense -> Loadable
 
 export default ({
     c
 }) => {
     const [count, setCount] = useState(0);
     const renderTimes = useRenderTimes();
-    const { data, status, refresh } = useStoreSuspense('suspenseValue', {
-        args: count,
+    const { data, status, refresh } = useStoreSuspense('suspense2', {
+        args: {
+            count,
+            c,
+        },
         manual: false,
     });
 
     return (
-        <div>
-            <h1>case5</h1>
+        <div className="child">
+            <h1>case6</h1>
             <p>component renderTimes: { renderTimes }</p>
             <p>data: {data}</p>
             <p>status: {status}</p>

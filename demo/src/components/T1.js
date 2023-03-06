@@ -10,7 +10,7 @@ export default () => {
     const sumAB = useStore((state) => state.sumCountAB);
 
     return (
-        <div>
+        <div className="child">
             <h1>case1</h1>
             <p>component renderTimes: { renderTimes }</p>
             <p>counta: {count}</p>

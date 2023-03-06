@@ -16,29 +16,7 @@ export type Persist = {
 const persist: Persist = (fn, options?) => {
     type TState = ReturnType<typeof fn>;
 
-    const result = zustandPersist(fn as any, {
-        ...options,
-        merge: (presistState: any, currentState: any) => {
-            let res: any = {};
-            if (options?.merge) {
-                res = options.merge(presistState, currentState);
-            } else {
-                res = {
-                    ...currentState,
-                    ...presistState,
-                };
-            }
-            for (const key in res) {
-                if (typeof currentState[key] === 'object' && currentState[key]?.sustand_internal_issuspense) {
-                    res[key] = {
-                        ...currentState[key],
-                        ...res[key],
-                    };
-                }
-            }
-            return res;
-        }
-    } as PersistOptions<TState>);
+    const result = zustandPersist(fn as any, options as PersistOptions<TState>);
 
     return result as any;
 };

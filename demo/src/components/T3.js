@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useStore } from '@store';
 import { useRenderTimes } from '../hook';
 
 export default () => {
     const renderTimes = useRenderTimes();
-    const [countd, setCountD] = useStore((state) => [state.countd, state.setCountD]);
+    const [countd, setCountD] = useStore((state) => {
+        return [state.countd, state.setCountD]
+    });
 
     return (
-        <div>
+        <div className="child">
             <h1>case3</h1>
             <p>component renderTimes: { renderTimes }</p>
             <p>count: {countd}</p>

@@ -3,7 +3,6 @@ import { SetState, GetState, StoreCreateApi } from '../types';
 
 const setMiddleware = (func) => (set, get, api) => {
     const originSetState = api.setState;
-    console.log(originSetState);
 
     // eslint-disable-next-line
     api.setState = (partial, desc: string) => {
@@ -28,7 +27,11 @@ const devtools: Devtools = (
     options:DevtoolsOptions = {}
 ) => (zustandDevtools as any)(setMiddleware(func), options);
 
-export default devtools;
+const wrapper = (options) => {
+    return (func) => devtools(func, options);
+}
+
+export default wrapper;
 
 export type {
     DevtoolsOptions,

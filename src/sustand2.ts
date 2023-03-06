@@ -4,15 +4,21 @@ import { shallow } from 'zustand/shallow';
 import getSuspense from './getStoreSuspense';
 import collect from './utils/collet';
 import getWrapper from './utils/getWrapper';
-// import persist from './middlewares/persist';
-// import devtools from './middlewares/devtools';
 
-const createSustand = (func: (set: any, get: any, api: any) => any) => {
+const createSustand = (func: (set: any, get: any, api: any) => any, {
+    middlewars = [],
+}) => {
     const computedCaches = {};
     const suspenseCaches = {};
     const lazySetActions = {};
+    
+    let createFn = collect(func, computedCaches, suspenseCaches);
 
-    const useZustandStore = create(collect(func, computedCaches, suspenseCaches));
+    middlewars.forEach((middware) => {
+        createFn = middware(createFn);
+    });
+
+    const useZustandStore = create(createFn);
 
     // 单独将 store 的方法导出
     const store = {
@@ -23,8 +29,6 @@ const createSustand = (func: (set: any, get: any, api: any) => any) => {
         // @ts-ignore
         subscribeWithSelector: useZustandStore.subscribeWithSelector,
     };
-
-    // store.setState({}, 'init');
 
     store.subscribe((state) => {
         Object.keys(computedCaches).forEach((key) => {

@@ -21,4 +21,10 @@ const persist: Persist = (fn, options?) => {
     return result as any;
 };
 
-export default persist;
+const wrapper = (options?) => {
+    return (fn) => {
+        return persist(fn, options);
+    }
+}
+
+export default wrapper;

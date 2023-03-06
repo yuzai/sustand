@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, createElement } from 'react';
 import { shallow } from 'zustand/shallow';
 
 const getSuspense = ({
@@ -15,7 +15,12 @@ const getSuspense = ({
 
         let createPromise;
 
+        const cacheFromServer = typeof window === 'undefined' ? {}
+            // eslint-disable-next-line
+            : window?.__ssrstreamingdata__?.[cacheKey] || {};
+
         if (!state[cacheKey]) {
+            const fromLocal = !!store.getState(key)[cacheKey]?.data;
             state[cacheKey] = {
                 status: 'pending',
                 data: store.getState(key)[cacheKey]?.data || config.initialValue,
@@ -24,7 +29,9 @@ const getSuspense = ({
                 refresh: () => {},
                 fullfilledOnce: false,
                 force: false,
+                fromLocal,
                 fromServer: false,
+                ...cacheFromServer,
             }
 
             if (config.selector && typeof config.selector === 'function') {
@@ -54,6 +61,8 @@ const getSuspense = ({
                         error: null,
                         fullfilledOnce: true,
                         force: false,
+                        fromLocal: false,
+                        fromServer: false,
                     };
                     store.setState({
                         [key]: {
@@ -70,6 +79,8 @@ const getSuspense = ({
                         ...state[cacheKeyValue],
                         status: 'rejected',
                         error: e,
+                        fromLocal: false,
+                        fromServer: false,
                     };
                     store.setState({
                         [key]: {
@@ -119,7 +130,7 @@ const getSuspense = ({
             }
         }, (a, b) => a.status === b.status && shallow(a.data, b.data));
 
-        const { cache, fullfilledOnce, force, error } = state[cacheKey];
+        const { cache, fullfilledOnce, force, error, fromLocal, fromServer } = state[cacheKey];
         const { loadable, manual } = options;
 
         if (loadable && !force) {
@@ -133,31 +144,69 @@ const getSuspense = ({
             };
         }
 
+        const loadScript = createElement('div', {
+            dangerouslySetInnerHTML: {
+                __html: `<script>
+                    window.__ssrstreamingdata__ = window.__ssrstreamingdata__ || {};
+                    window.__ssrstreamingdata__[JSON.stringify(${cacheKey})] = ${JSON.stringify({
+    data,
+    status,
+    fromServer: true,
+})}
+                </script>`
+            },
+        });
+
+        if (fromServer) {
+            return {
+                data,
+                status,
+                refresh: createPromise,
+                loadScript,
+            };
+        }
+
         if (!cache) {
             if (!manual) {
-                throw createPromise();
+                if (!fromLocal) {
+                    throw createPromise();
+                } else {
+                    createPromise();
+                }
             }
             return {
                 data,
                 status,
                 refresh: createPromise,
+                loadScript,
             }
         }
+
+        if (fromLocal) {
+            return {
+                data,
+                status,
+                refresh: createPromise,
+                loadScript,
+            }
+        }
+
         if (fullfilledOnce && !force) {
             return {
                 data,
                 status,
                 refresh: createPromise,
+                loadScript,
             }
         }
 
-        // 未完成过，正常走 suspense 逻辑即可
         switch (status) {
             case 'pending': throw cache;
             case 'fullfilled': return {
                 data,
                 status: status,
                 refresh: createPromise,
+                loadScript,
             };
             case 'rejected': throw error;
             default: break;
@@ -167,6 +216,7 @@ const getSuspense = ({
             data,
             status,
             refresh: createPromise,
+            loadScript,
         }
     };
 

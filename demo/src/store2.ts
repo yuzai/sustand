@@ -1,4 +1,4 @@
-import create, { compute, Computed, Suspensed, suspense } from "sustand";
+import create, { devtools, compute, Computed, Suspensed, suspense } from "sustand";
 
 interface Store {
     a: number,
@@ -36,7 +36,13 @@ const { store, useStore } = create<Store>()((set, get) => ({
             }, 1000)
         })
     }),
-}));
+}), {
+    middwares: [
+        devtools({
+            name: 'ttt',
+        })
+    ]
+});
 
 
 const s = store.getState('sumAB')

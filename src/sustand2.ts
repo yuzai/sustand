@@ -15,12 +15,6 @@ import getSuspense from './getStoreSuspense';
 import collect from './utils/collet';
 import getWrapper from './utils/getWrapper';
 
-export { default as suspense } from './utils/suspense';
-
-export { default as compute } from './utils/compute';
-
-export { default as shallow } from 'zustand/shallow';
-
 type Options = {
     middwares?: (<T extends {}>(fn: StateCreatorTs<T>) => (set: SetStateTs<T>, get: GetStateTs<T>, api: StoreApi<T>) => T)[]
 }

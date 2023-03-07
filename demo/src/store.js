@@ -62,10 +62,11 @@ export {
 }
 
 const s = store.getState();
+
 setTimeout(() => {
     console.log(store.getState());
 }, 200);
 // const d = useStore(state => state.sumCountAB);
 
-const susp = useStoreSuspense('suspense1');
+// const susp = useStoreSuspense('suspense1');
 

@@ -1,3 +1,28 @@
+export type Status = 'pending' | 'fullfilled' | 'rejected';
+
+/** 初始化时对 state 的转换 */
+export type Convert<T> = {
+    [property in keyof T]:
+        T[property] extends { action: (...args: any) => any, sustand_internal_iscomputed: boolean }
+            ? ReturnType<T[property]["action"]> :
+            T[property] extends { action: (...args: any) => any, sustand_internal_issuspense: boolean }
+                ? {
+                    [key: string]: {
+                        data: Awaited<ReturnType<T[property]["action"]>>,
+                        status: Status,
+                        error: any
+                    }
+                } : T[property]
+}
+
+/** 标记 suspense 的原始类型 */
+export type SuspensedConvert<T> = {
+    [property in keyof T]: T[property] extends { action: (...args: any) => any, sustand_internal_issuspense: boolean } ? {
+        data: Awaited<ReturnType<T[property]["action"]>>,
+        sustand_internal_issuspense: true,
+    } : T[property]
+}
+
 /** 比较器函数 */
 export type Compare<T> = (preState: T, nextState: T) => boolean;
 
@@ -11,16 +36,14 @@ export type UseStore<T> = {
     [state: T[K], setState: T[K] | ((state: T[K]) => T[K])];
 };
 
-export type Status = 'pending' | 'fullfilled' | 'rejected';
-
 /** 获取loadable */
 export type UseStoreLoadable<T> = {
-    <K extends keyof T>(key: K, options?: {
+    <S extends SuspensedConvert<T>, K extends keyof S>(key: K, options?: {
         args?: any,
         manual?: boolean,
     }):
     {
-        data: T[K],
+        data: S[K] extends { data: any, sustand_internal_issuspense: boolean } ? S[K]["data"] : never,
         status: Status,
         // error: any,
         refresh: () => void,
@@ -29,13 +52,13 @@ export type UseStoreLoadable<T> = {
 
 /** 获取suspense */
 export type UseStoreSuspense<T> = {
-    <K extends keyof T>(key: K, options?: {
+    <S extends SuspensedConvert<T>, K extends keyof S>(key: K, options?: {
         args?: any,
         manual?: boolean,
         loadable?: boolean,
     }):
     {
-        data: T[K] extends { data: any } ? T[K]["data"] : any,
+        data: S[K] extends { data: any, sustand_internal_issuspense: boolean } ? S[K]["data"] : never,
         status: Status,
         // error: any,
         refresh: () => void,
@@ -44,7 +67,7 @@ export type UseStoreSuspense<T> = {
 
 export type SetState<T> = {
     (
-        partial: T | Partial<T> | { _(state: T): T | Partial<T> }['_'],
+        partial: T | Partial<T> | ((state: T) => T | Partial<T>),
         replace?: boolean | undefined
     ): void
 }
@@ -60,7 +83,7 @@ export type GetWrapper = <T>(f: () => T) => GetState<T>;
 export type StoreApi<T> = {
     getState: GetState<T>,
     setState: SetState<T>,
-    subscribe: (listener: ((state: T, prevState: T) => void)) => void,
+    subscribe: (listener: ((state: T, prevState: T) => void)) => () => void,
     subscribeWithSelector?: (
         selector: (states: T) => any,
         listener: (cur: any, pre: any) => any,
@@ -71,34 +94,27 @@ export type StoreApi<T> = {
     ) => void,
 };
 
-export type Convert<T> = {
-    [property in keyof T]:
-        T[property] extends { action: (...args: any) => any, sustand_internal_iscomputed: boolean }
-            ? ReturnType<T[property]["action"]> :
-            T[property] extends { action: (...args: any) => any, sustand_internal_issuspense: boolean }
-                ? {
-                    data: Awaited<ReturnType<T[property]["action"]>>,
-                    status: any,
-                    error: any
-                } : T[property]
-}
-
+/** 为 js 准备的类型声明 */
 export type StateCreator<T> = (set: SetState<any>, get: GetState<any>, api: StoreApi<any>) => T;
 
-export type StateCreatorTs<T extends {}> = (set: SetState<T>, get: GetState<T>, api: StoreApi<T>) => T;
+/** 为原始 zustand 准备的类型声明 */
+export type StateCreatorMiddware<T extends {}> = (set: SetState<T>, get: GetState<T>, api: StoreApi<T>) => T;
+
+/** 为本项目准备的类型声明 */
+export type StateCreatorTs<T extends {}> = (set: SetState<Convert<T>>, get: GetState<Convert<T>>, api: StoreApi<Convert<T>>) => T;
 
 /** 创建 store */
 export type Create = {
     <T extends {}>(create: StateCreator<T>, opts?: any): {
         useStore: UseStore<Convert<T>>,
-        useStoreSuspense: UseStoreSuspense<Convert<T>>,
-        useStoreLoadable: UseStoreLoadable<Convert<T>>,
+        useStoreSuspense: UseStoreSuspense<T>,
+        useStoreLoadable: UseStoreLoadable<T>,
         store: StoreApi<Convert<T>>
     },
     <T extends {}>(): (create: StateCreatorTs<T>, opts?: any) => {
         useStore: UseStore<Convert<T>>,
-        useStoreSuspense: UseStoreSuspense<Convert<T>>,
-        useStoreLoadable: UseStoreLoadable<Convert<T>>,
+        useStoreSuspense: UseStoreSuspense<T>,
+        useStoreLoadable: UseStoreLoadable<T>,
         store: StoreApi<Convert<T>>
     },
 };

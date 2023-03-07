@@ -9,14 +9,15 @@ import {
     StateCreatorTs,
     Convert,
     GetState,
-    SetState
+    SetState,
+    StateCreatorMiddware
 } from './types';
 import getSuspense from './getStoreSuspense';
 import collect from './utils/collet';
 import getWrapper from './utils/getWrapper';
 
 type Options = {
-    middwares?: (<T extends {}>(fn: StateCreatorTs<T>) => (set: SetState<T>, get: GetState<T>, api: StoreApi<T>) => T)[]
+    middwares?: (<T extends {}>(fn: StateCreatorMiddware<T>) => StateCreatorMiddware<T>)[]
 }
 
 const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: Options) => {
@@ -24,7 +25,7 @@ const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: Options)
     const suspenseCaches = {};
     const lazySetActions = {};
     
-    let createFn = collect<T>(func, computedCaches, suspenseCaches) as StateCreatorTs<Convert<T>>;
+    let createFn = collect<T>(func, computedCaches, suspenseCaches) as StateCreatorMiddware<T>;
 
     options?.middwares?.forEach((middware) => {
         createFn = middware(createFn);
@@ -32,7 +33,7 @@ const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: Options)
 
 
     // @ts-ignore
-    const useZustandStore = createZustand(createFn);
+    const useZustandStore = createZustand<Convert<T>>(createFn);
 
     // 单独将 store 的方法导出
     const store: StoreApi<Convert<T>> = {

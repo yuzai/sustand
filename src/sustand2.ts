@@ -8,15 +8,15 @@ import {
     StoreApi,
     StateCreatorTs,
     Convert,
-    GetStateTs,
-    SetStateTs
+    GetState,
+    SetState
 } from './types';
 import getSuspense from './getStoreSuspense';
 import collect from './utils/collet';
 import getWrapper from './utils/getWrapper';
 
 type Options = {
-    middwares?: (<T extends {}>(fn: StateCreatorTs<T>) => (set: SetStateTs<T>, get: GetStateTs<T>, api: StoreApi<T>) => T)[]
+    middwares?: (<T extends {}>(fn: StateCreatorTs<T>) => (set: SetState<T>, get: GetState<T>, api: StoreApi<T>) => T)[]
 }
 
 const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: Options) => {

@@ -61,10 +61,11 @@ export {
     useStoreLoadable,
 }
 
-const s = store.getState('sumCountAB');
+const s = store.getState();
+setTimeout(() => {
+    console.log(store.getState());
+}, 200);
+// const d = useStore(state => state.sumCountAB);
 
-const d = useStore(state => state.sumCountAB);
+const susp = useStoreSuspense('suspense1');
 
-const susp = useStore(state => state);
-
-console.log(susp.suspense1);

@@ -2,8 +2,8 @@ import { memoize } from 'proxy-memoize';
 import {
     StateCreatorTs,
     Convert,
-    SetStateTs,
-    GetStateTs,
+    SetState,
+    GetState,
     StoreApi
 } from '../types';
 
@@ -11,7 +11,7 @@ const collect = <T extends {}>(
     func: StateCreatorTs<T>,
     computedCaches,
     suspenseCaches
-) => (set: SetStateTs<T>, get: GetStateTs<T>, api: StoreApi<T>): Convert<T> => {
+) => (set: SetState<T>, get: GetState<T>, api: StoreApi<T>): Convert<T> => {
     const state = func(set, get, api);
     Object.keys(state).forEach((key) => {
         if (state[key] && state[key].sustand_internal_iscomputed) {

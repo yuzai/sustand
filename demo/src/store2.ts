@@ -6,10 +6,10 @@ interface Store {
     d: Function,
     sumAB: Computed<Store, number>,
     sumABAB: Computed<Store, number>,
-    suspenseV1: Suspensed<Store, string>,
+    suspenseV1: Suspensed<Store, number>,
 }
 
-const { store, useStore } = create<Store>()((set, get) => ({
+const { store, useStore, useStoreSuspense } = create<Store>()((set, get) => ({
     a: 1,
     b: 2,
     d: () => {
@@ -32,7 +32,7 @@ const { store, useStore } = create<Store>()((set, get) => ({
     suspenseV1: suspense(() => {
         return new Promise((resolve) => {
             setTimeout(() => {
-                resolve('100');
+                resolve(100);
             }, 1000)
         })
     }),
@@ -49,4 +49,6 @@ const s = store.getState('sumAB')
 
 const d = store.getState('suspenseV1');
 
-useStore(state => state.suspenseV1);
+const all = store.getState();
+
+const res = useStoreSuspense('suspenseV1');

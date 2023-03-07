@@ -15,10 +15,10 @@ export default ({
     } = useStoreSuspense('suspense1', {
         // loadable: true,
         // manual: true,
-        args: {
-            a: 1,
-            b: 2 + c,
-        }
+        // args: {
+        //     a: 1,
+        //     b: 2 + c,
+        // }
     });
 
     return (

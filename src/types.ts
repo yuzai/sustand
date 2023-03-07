@@ -7,19 +7,21 @@ export type Selector<T, S> = (states: T) => S;
 /** 获取普通状态 */
 export type UseStore<T> = {
     <S>(selector: Selector<T, S>, compare?: Compare<T>): S;
-    (key: keyof T, compare?: Compare<T>):
-    [state: T[keyof T], setState: T[keyof T] | ((state: T[keyof T]) => any)];
+    <K extends keyof T>(key: K, compare?: Compare<T>):
+    [state: T[K], setState: T[K] | ((state: T[K]) => T[K])];
 };
+
+export type Status = 'pending' | 'fullfilled' | 'rejected';
 
 /** 获取loadable */
 export type UseStoreLoadable<T> = {
-    (key: keyof T, options?: {
+    <K extends keyof T>(key: K, options?: {
         args?: any,
         manual?: boolean,
     }):
     {
-        data: any,
-        status: 'pending' | 'fullfilled' | 'rejected',
+        data: T[K],
+        status: Status,
         // error: any,
         refresh: () => void,
     };
@@ -27,48 +29,37 @@ export type UseStoreLoadable<T> = {
 
 /** 获取suspense */
 export type UseStoreSuspense<T> = {
-    (key: keyof T, options?: {
+    <K extends keyof T>(key: K, options?: {
         args?: any,
         manual?: boolean,
         loadable?: boolean,
     }):
     {
-        data: any,
-        status: 'pending' | 'fullfilled' | 'rejected',
+        data: T[K] extends { data: any } ? T[K]["data"] : any,
+        status: Status,
         // error: any,
         refresh: () => void,
     };
 };
 
-export type GetState = {
-    (getter: string): any,
-    <S>(getter: (states: any) => S):S,
-    (): any,
-};
-
-export type SetState = {
-    (partial: { [key: string]: any }, desc?: string): void,
-    <T>(partial: (states: T) => T | Partial<T>, desc?: string): void,
-};
-
-export type SetStateTs<T> = {
+export type SetState<T> = {
     (
         partial: T | Partial<T> | { _(state: T): T | Partial<T> }['_'],
         replace?: boolean | undefined
     ): void
 }
 
-export type GetStateTs<T> = {
+export type GetState<T> = {
     <K extends keyof T>(key: K): T[K];
     <S>(selector: (state: T) => S): S;
     (): T,
 }
 
-export type GetWrapper = <T>(f: () => T) => GetStateTs<T>;
+export type GetWrapper = <T>(f: () => T) => GetState<T>;
 
 export type StoreApi<T> = {
-    getState: GetStateTs<T>,
-    setState: SetStateTs<T>,
+    getState: GetState<T>,
+    setState: SetState<T>,
     subscribe: (listener: ((state: T, prevState: T) => void)) => void,
     subscribeWithSelector?: (
         selector: (states: T) => any,
@@ -92,9 +83,9 @@ export type Convert<T> = {
                 } : T[property]
 }
 
-export type StateCreator<T> = (set: SetStateTs<any>, get: GetStateTs<any>, api: StoreApi<any>) => T;
+export type StateCreator<T> = (set: SetState<any>, get: GetState<any>, api: StoreApi<any>) => T;
 
-export type StateCreatorTs<T extends {}> = (set: SetStateTs<T>, get: GetStateTs<T>, api: StoreApi<T>) => T;
+export type StateCreatorTs<T extends {}> = (set: SetState<T>, get: GetState<T>, api: StoreApi<T>) => T;
 
 /** 创建 store */
 export type Create = {
@@ -121,8 +112,8 @@ export type Suspensed<T, S> = {
     action: (...args: any[]) => Promise<S>,
     sustand_internal_issuspense: boolean,
     initialValue?: S,
-    selector?: (state: T) => any,
-    compare: (cur: T, pre: T) => boolean,
+    selector?: (state: Convert<T>) => any,
+    compare: (cur: Convert<T>, pre: Convert<T>) => boolean,
 }
 
 declare global {

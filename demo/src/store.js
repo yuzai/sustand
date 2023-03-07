@@ -59,6 +59,7 @@ export {
     useStore,
     useStoreSuspense,
     useStoreLoadable,
+    store,
 }
 
 const s = store.getState();

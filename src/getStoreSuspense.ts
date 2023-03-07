@@ -13,7 +13,7 @@ const getSuspense = ({
         const cacheKey = JSON.stringify(options.args);
         const state = config.state;
 
-        let createPromise;
+        let createPromise: (force?: boolean) => Promise<any>;
 
         const cacheFromServer = typeof window === 'undefined' ? {}
             // eslint-disable-next-line
@@ -71,6 +71,7 @@ const getSuspense = ({
                                 status: state[cacheKeyValue].status,
                                 error: state[cacheKeyValue].error,
                                 data: state[cacheKeyValue].data,
+                                refresh: createPromise,
                             }
                         }
                     });
@@ -89,6 +90,7 @@ const getSuspense = ({
                                 status: state[cacheKeyValue].status,
                                 error: state[cacheKeyValue].error,
                                 data: state[cacheKeyValue].data,
+                                refresh: createPromise,
                             }
                         }
                     })
@@ -109,6 +111,7 @@ const getSuspense = ({
                             status: state[cacheKeyValue].status,
                             error: state[cacheKeyValue].error,
                             data: state[cacheKeyValue].data,
+                            refresh: createPromise,
                         }
                     }
                 })
@@ -138,6 +141,7 @@ const getSuspense = ({
                 createPromise();
             }
             return {
+                error,
                 data,
                 status,
                 refresh: createPromise,
@@ -159,6 +163,7 @@ const getSuspense = ({
 
         if (fromServer) {
             return {
+                error,
                 data,
                 status,
                 refresh: createPromise,
@@ -175,6 +180,7 @@ const getSuspense = ({
                 }
             }
             return {
+                error,
                 data,
                 status,
                 refresh: createPromise,
@@ -184,6 +190,7 @@ const getSuspense = ({
 
         if (fromLocal) {
             return {
+                error,
                 data,
                 status,
                 refresh: createPromise,
@@ -193,6 +200,7 @@ const getSuspense = ({
 
         if (fullfilledOnce && !force) {
             return {
+                error,
                 data,
                 status,
                 refresh: createPromise,
@@ -203,6 +211,7 @@ const getSuspense = ({
         switch (status) {
             case 'pending': throw cache;
             case 'fullfilled': return {
+                error,
                 data,
                 status: status,
                 refresh: createPromise,
@@ -213,6 +222,7 @@ const getSuspense = ({
         }
 
         return {
+            error,
             data,
             status,
             refresh: createPromise,

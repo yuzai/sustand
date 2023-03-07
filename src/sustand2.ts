@@ -8,8 +8,6 @@ import {
     StoreApi,
     StateCreatorTs,
     Convert,
-    GetState,
-    SetState,
     StateCreatorMiddware
 } from './types';
 import getSuspense from './getStoreSuspense';

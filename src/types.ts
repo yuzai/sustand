@@ -10,7 +10,8 @@ export type Convert<T> = {
                     [key: string]: {
                         data: Awaited<ReturnType<T[property]["action"]>>,
                         status: Status,
-                        error: any
+                        error: any,
+                        refresh: (force?: boolean) => Promise<any>,
                     }
                 } : T[property]
 }
@@ -45,8 +46,8 @@ export type UseStoreLoadable<T> = {
     {
         data: S[K] extends { data: any, sustand_internal_issuspense: boolean } ? S[K]["data"] : never,
         status: Status,
-        // error: any,
-        refresh: () => void,
+        error: any,
+        refresh: (force?: boolean) => Promise<any>,
     };
 };
 
@@ -60,8 +61,8 @@ export type UseStoreSuspense<T> = {
     {
         data: S[K] extends { data: any, sustand_internal_issuspense: boolean } ? S[K]["data"] : never,
         status: Status,
-        // error: any,
-        refresh: () => void,
+        error: any,
+        refresh: (force?: boolean) => Promise<any>,
     };
 };
 

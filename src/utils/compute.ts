@@ -1,16 +1,8 @@
-type SuspenseData = {
-    data: any,
-    action: any,
-    sustand_internal_iscomputed: boolean,
-};
+import { Convert } from "../types";
 
-export default (
-    action: (...parmas: any[]) => Promise<any>,
-    options: {
-        initialValue?: any,
-    } = {}
-) : SuspenseData => ({
+export default <T, S>(
+    action: (state: Convert<T>) => S,
+) => ({
     action,
-    data: {},
     sustand_internal_iscomputed: true,
 });

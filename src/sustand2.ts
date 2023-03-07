@@ -1,33 +1,50 @@
-import { create } from 'zustand';
+import { create as createZustand } from 'zustand';
 import { useCallback } from 'react';
 import { shallow } from 'zustand/shallow';
+import {
+    Create,
+    UseStore,
+    UseStoreSuspense,
+    StoreApi,
+    StateCreatorTs,
+    Convert,
+    GetStateTs,
+    SetStateTs
+} from './types';
 import getSuspense from './getStoreSuspense';
 import collect from './utils/collet';
 import getWrapper from './utils/getWrapper';
 
-const createSustand = (func: (set: any, get: any, api: any) => any, {
-    middlewars = [],
-}) => {
+export { default as suspense } from './utils/suspense';
+
+export { default as compute } from './utils/compute';
+
+export { default as shallow } from 'zustand/shallow';
+
+type Options = {
+    middwares?: (<T extends {}>(fn: StateCreatorTs<T>) => (set: SetStateTs<T>, get: GetStateTs<T>, api: StoreApi<T>) => T)[]
+}
+
+const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: Options) => {
     const computedCaches = {};
     const suspenseCaches = {};
     const lazySetActions = {};
     
-    let createFn = collect(func, computedCaches, suspenseCaches);
+    let createFn = collect<T>(func, computedCaches, suspenseCaches) as StateCreatorTs<Convert<T>>;
 
-    middlewars.forEach((middware) => {
+    options?.middwares?.forEach((middware) => {
         createFn = middware(createFn);
     });
 
-    const useZustandStore = create(createFn);
+
+    // @ts-ignore
+    const useZustandStore = createZustand(createFn);
 
     // 单独将 store 的方法导出
-    const store = {
+    const store: StoreApi<Convert<T>> = {
         getState: getWrapper(useZustandStore.getState),
         setState: useZustandStore.setState,
         subscribe: useZustandStore.subscribe,
-        // eslint-disable-next-line
-        // @ts-ignore
-        subscribeWithSelector: useZustandStore.subscribeWithSelector,
     };
 
     store.subscribe((state) => {
@@ -37,7 +54,7 @@ const createSustand = (func: (set: any, get: any, api: any) => any, {
         });
     });
 
-    const useStoreSuspense = getSuspense({
+    const useStoreSuspense: UseStoreSuspense<T> = getSuspense({
         store,
         useZustandStore,
         suspenseCaches,
@@ -54,27 +71,33 @@ const createSustand = (func: (set: any, get: any, api: any) => any, {
         })
     }
 
-    const useStore = (f?, compare?): any => {
+    const useStore: UseStore<T> = (f?, compare?): any => {
         let fn = f;
         // 比较函数默认全部 shallow
         let isEqual = compare || shallow;
         // useStore('key') 时，将比较函数整理成仅比较 state
         const compareData = useCallback((a, b) => shallow(a[0], b[0]), []);
         if (typeof f === 'string') {
-            // TODO:如果选择的属性是函数 or suspense value，发出警告
-            // 惰性生成 setState
+            const state = store.getState();
             let setState = lazySetActions[f];
             if (!setState) {
-                lazySetActions[f] = (v) => {
+                lazySetActions[f] = (v: Function | any) => {
                     if (typeof v === 'function') {
-                        console.log(store.setState);
-                        store.setState({ [f]: v(store.getState()[f]) });
+                        if (f in state) {
+                            store.setState({
+                                [f]: v(store.getState()[f])
+                            } as Partial<Convert<T>>);
+                        }
                     } else {
-                        store.setState({ [f]: v });
+                        store.setState({
+                            [f]: v
+                        } as Partial<Convert<T>>);
                     }
                 };
                 setState = lazySetActions[f];
             }
+            // TODO:如果选择的属性是函数 or suspense value，发出警告
+            // 惰性生成 setState
             fn = (state) => [state[f], setState];
             isEqual = compare || compareData;
         }
@@ -92,4 +115,8 @@ const createSustand = (func: (set: any, get: any, api: any) => any, {
     };
 }
 
-export default createSustand;
+const create = (<T extends {}>(createState?: StateCreatorTs<Convert<T>>, options?: Options) =>
+    createState ? createSustand(createState, options) : createSustand) as Create;
+
+export default create;
+

@@ -1,26 +1,16 @@
 import { shallow } from 'zustand/shallow';
 
-type SuspenseData = {
-    data: any,
-    action: any,
-    selector: any,
-    initialValue: any,
-    compare: any,
-    sustand_internal_issuspense: boolean,
-};
-
-export default (
-    action: (...parmas: any[]) => Promise<any>,
+export default <T, S>(
+    action: (...parmas: any[]) => Promise<S>,
     options: {
-        selector?: (state: any) => any,
+        selector?: (state: T) => any,
         initialValue?: any,
         compare?: <T>(a: T, b: T) => boolean,
     } = {}
-) : SuspenseData => ({
+) => ({
     action,
-    selector: options.selector || null,
+    selector: options.selector,
     compare: options.compare || shallow,
     initialValue: options.initialValue || undefined,
-    data: {},
     sustand_internal_issuspense: true,
 });

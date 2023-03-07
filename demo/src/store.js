@@ -60,3 +60,11 @@ export {
     useStoreSuspense,
     useStoreLoadable,
 }
+
+const s = store.getState('sumCountAB');
+
+const d = useStore(state => state.sumCountAB);
+
+const susp = useStore(state => state);
+
+console.log(susp.suspense1);

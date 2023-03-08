@@ -7,6 +7,13 @@ import {
     StoreApi,
 } from '../types';
 
+let wrapper = memoize;
+
+// 当不支持 proxy 时，直接走透传逻辑
+if (!window.Proxy) {
+    wrapper = (fn) => fn;
+}
+
 const collect = <T extends {}>(
     func: StateCreatorTs<T>,
     computedCaches,
@@ -17,7 +24,7 @@ const collect = <T extends {}>(
         if (state[key] && state[key].sustand_internal_iscomputed) {
             computedCaches[key] = {
                 ...state[key],
-                action: memoize(state[key].action || (() => null)),
+                action: wrapper(state[key].action || (() => null)),
             }
             state[key] = null;
         }

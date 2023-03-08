@@ -4,7 +4,8 @@ import { shallow } from 'zustand/shallow';
 const getSuspense = ({
     store,
     useZustandStore,
-    suspenseCaches
+    suspenseCaches,
+    computedCaches,
 }) => {
     const useStoreSuspense = (key, options:any = {}) => {
         const config = suspenseCaches[key];
@@ -162,23 +163,17 @@ const getSuspense = ({
         });
 
         if (fromServer && typeof window !== 'undefined') {
-            store.setState({
-                [key]: {
-                    [cacheKey]: {
-                        error,
-                        data: state[cacheKey].data,
-                        status: state[cacheKey].status,
-                        refresh: createPromise,
-                    }
-                }
-            })
-            // // 如果是来自于服务端渲染，那么需要静默的同步到 state 中
-            // store.getState()[key][cacheKey] = {
-            //     error,
-            //     data: state[cacheKey].data,
-            //     status: state[cacheKey].status,
-            //     refresh: createPromise,
-            // }
+            // 如果是来自于服务端渲染，那么需要静默的同步到 state 中
+            store.getState()[key][cacheKey] = {
+                error,
+                data: state[cacheKey].data,
+                status: state[cacheKey].status,
+                refresh: createPromise,
+            }
+            Object.keys(computedCaches).forEach((key) => {
+                state[key] = computedCaches[key].action(state);
+                computedCaches[key].data = state[key];
+            });
             return {
                 error,
                 data: state[cacheKey].data,

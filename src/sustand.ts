@@ -55,13 +55,15 @@ const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: Options)
         store,
         useZustandStore,
         suspenseCaches,
+        computedCaches,
     });
 
     const useStoreLoadable = (key: string, options?) => {
         return getSuspense({
             store,
             useZustandStore,
-            suspenseCaches
+            suspenseCaches,
+            computedCaches,
         })(key, {
             ...options,
             loadable: true,

@@ -1,2 +1,3 @@
-declare const _default: 1;
-export default _default;
+import { Create } from './types';
+declare const create: Create;
+export default create;

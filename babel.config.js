@@ -1,6 +1,4 @@
 module.exports = function(api) {
-    console.log(api.env('es'));
-
     return {
         presets: 
         [

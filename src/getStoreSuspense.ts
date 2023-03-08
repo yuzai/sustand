@@ -161,7 +161,7 @@ const getSuspense = ({
             },
         });
 
-        if (fromServer) {
+        if (fromServer && typeof window !== 'undefined') {
             store.setState({
                 [key]: {
                     [cacheKey]: {

@@ -1,5 +1,5 @@
 {
-  "name": "sustand",
+  "name": "zustand-with-suspense",
   "version": "0.0.4-beta.3",
   "description": "",
   "main": "lib/index.js",

@@ -166,8 +166,8 @@ const getSuspense = ({
         if (fromServer) {
             return {
                 error,
-                data,
-                status,
+                data: state[cacheKey].data,
+                status: state[cacheKey].status,
                 refresh: createPromise,
                 loadScript,
             };

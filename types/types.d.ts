@@ -92,7 +92,7 @@ export type StateCreator<T> = (set: SetState<any>, get: GetState<any>, api: Stor
 /** 为原始 zustand 准备的类型声明 */
 export type StateCreatorMiddware<T extends {}> = (set: SetState<T>, get: GetState<T>, api: StoreApi<T>) => T;
 /** 为本项目准备的类型声明 */
-export type StateCreatorTs<T extends {}> = (set: SetState<Convert<T>>, get: GetState<Convert<T>>, api: StoreApi<Convert<T>>) => T;
+export type StateCreatorTs<T extends {}, S = T> = (set: SetState<Convert<S & T>>, get: GetState<Convert<S & T>>, api: StoreApi<Convert<S & T>>) => S;
 /** 创建 store */
 export type Create = {
     <T extends {}>(create: StateCreator<T>, opts?: any): {

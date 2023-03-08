@@ -2,14 +2,23 @@
   "name": "sustand",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "module": "es/index.js",
+  "typings": "types/index.d.ts",
+  "files": [
+    "lib",
+    "types",
+    "es",
+    "src"
+  ],
   "scripts": {
     "dev": "webpack serve --config ./demo/webpack/main.config.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc && npm run build:es && npm run build:cjs",
+    "build": "npm run clean && npm run types && npm run build:es && npm run build:cjs",
     "build:es": "NODE_ENV=es babel src -d es --extensions '.ts'",
     "build:cjs": "NODE_ENV=commonjs babel src -d lib --extensions '.ts'",
-    "types": "tsc"
+    "types": "tsc -p tsconfig.build.json",
+    "clean": "rm -rf lib types es"
   },
   "keywords": [],
   "author": "",

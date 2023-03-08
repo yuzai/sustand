@@ -1,4 +1,4 @@
-const setMiddleware = (func) => (set, get, api) => {
+const setMiddleware = (func) => (_, get, api) => {
     const originSetState = api.setState;
 
     // eslint-disable-next-line

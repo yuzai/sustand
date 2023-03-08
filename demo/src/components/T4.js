@@ -28,7 +28,7 @@ export default ({
             <p>data: {JSON.stringify(data)}</p>
             <p>status: {JSON.stringify(status)}</p>
             <button onClick={() => {
-                console.log(store.getState('suspense1')['undefined'].refresh(true));
+                console.log(store.getState('suspense1')['default'].refresh(true));
             }}>refresh</button>
             <button onClick={() => setState(pre => pre + 1)}>+1</button>
         </div>

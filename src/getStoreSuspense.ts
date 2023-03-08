@@ -155,8 +155,8 @@ const getSuspense = ({
                 __html: `<script>
                     window.__ssrstreamingdata__ = window.__ssrstreamingdata__ || {};
                     window.__ssrstreamingdata__[JSON.stringify(${cacheKey})] = ${JSON.stringify({
-    data,
-    status,
+    data: state[cacheKey].data,
+    status: state[cacheKey].status,
     fromServer: true,
 })}
                 </script>`

@@ -1,8 +1,9 @@
 /// <reference types="react" />
-declare const getSuspense: ({ store, useZustandStore, suspenseCaches }: {
+declare const getSuspense: ({ store, useZustandStore, suspenseCaches, computedCaches, }: {
     store: any;
     useZustandStore: any;
     suspenseCaches: any;
+    computedCaches: any;
 }) => (key: any, options?: any) => {
     error: any;
     data: any;

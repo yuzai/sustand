@@ -136,8 +136,6 @@ const getSuspense = ({
         const { cache, fullfilledOnce, force, error, fromLocal, fromServer } = state[cacheKey];
         const { loadable, manual } = options;
 
-        console.log(key, loadable);
-
         if (loadable && !force) {
             if (!cache && !manual) {
                 createPromise();
@@ -164,6 +162,13 @@ const getSuspense = ({
         });
 
         if (fromServer) {
+            // 如果是来自于服务端渲染，那么需要静默的同步到 state 中
+            store.getState()[key][cacheKey] = {
+                error,
+                data: state[cacheKey].data,
+                status: state[cacheKey].status,
+                refresh: createPromise,
+            }
             return {
                 error,
                 data: state[cacheKey].data,

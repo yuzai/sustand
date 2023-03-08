@@ -1,33 +1,16 @@
 import { devtools as zustandDevtools, DevtoolsOptions } from 'zustand/middleware';
-import { SetState, GetState, StoreCreateApi } from '../types';
-
-const setMiddleware = (func) => (set, get, api) => {
-    const originSetState = api.setState;
-
-    // eslint-disable-next-line
-    api.setState = (partial, desc: string) => {
-        return originSetState(partial, false, desc);
-    };
-
-    const states = func(api.setState, get, api);
-
-    return states;
-};
+import { StateCreatorMiddware } from '../types';
 
 type Devtools = {
-    <T>(create: (
-        set: SetState,
-        get: GetState,
-        api: StoreCreateApi
-    ) => T, options?: DevtoolsOptions): (set: SetState, get: GetState, api: StoreCreateApi) => T
+    <T extends {}>(create: StateCreatorMiddware<T>, options?: DevtoolsOptions): StateCreatorMiddware<T>
 };
 
 const devtools: Devtools = (
-    func: any,
+    func,
     options:DevtoolsOptions = {}
-) => (zustandDevtools as any)(setMiddleware(func), options);
+) => (zustandDevtools as any)(func, options);
 
-const wrapper = (options) => {
+const wrapper = (options: DevtoolsOptions) => {
     return (func) => devtools(func, options);
 }
 

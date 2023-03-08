@@ -13,6 +13,7 @@ export default ({
             c,
         },
         manual: false,
+        loadable: true,
     });
 
     return (

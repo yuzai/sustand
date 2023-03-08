@@ -34,9 +34,9 @@ const { useStore, useStoreSuspense, store, useStoreLoadable } = create(
             compare: (a, b) => a[0] === b[0],
         }),
         suspense2: suspense((args) => {
-            return new Promise((resolve) => {
+            return new Promise((resolve, reject) => {
                 setTimeout(() => {
-                    resolve('2' + new Date().getTime() + JSON.stringify(args));
+                    reject('2' + new Date().getTime() + JSON.stringify(args));
                 }, 2000);
             });
         }, {
@@ -44,13 +44,13 @@ const { useStore, useStoreSuspense, store, useStoreLoadable } = create(
         }),
     }),
     {
-        middlewars: [
+        middwares: [
+            devtools({
+                name: 'tttt',
+            }),
             persist({
                 name: 'test',
             }),
-            devtools({
-                name: 'tttt',
-            })
         ]
     }
 );
@@ -65,7 +65,7 @@ export {
 const s = store.getState();
 
 setTimeout(() => {
-    console.log(store.getState());
+    console.log(store.setState);
 }, 200);
 // const d = useStore(state => state.sumCountAB);
 

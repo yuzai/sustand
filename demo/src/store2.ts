@@ -1,4 +1,4 @@
-import create, { devtools, compute, Computed, Suspensed, suspense } from "sustand";
+import create, { devtools, compute, Computed, Suspensed, suspense, persist } from "sustand";
 
 interface Store {
     a: number,
@@ -36,6 +36,7 @@ const { store, useStore, useStoreSuspense, useStoreLoadable } = create<Store>()(
         (state) => state.a + state.b + state.sumAB,
     ),
     suspenseV1: suspense(() => {
+        const res = get('f')
         return new Promise((resolve) => {
             setTimeout(() => {
                 resolve(100);
@@ -44,9 +45,12 @@ const { store, useStore, useStoreSuspense, useStoreLoadable } = create<Store>()(
     }),
 }), {
     middwares: [
+        persist({
+            name: 'qqqq',
+        }),
         devtools({
             name: 'ttt',
-        })
+        }),
     ]
 });
 

@@ -1,16 +1,12 @@
 import { persist as zustandPersist, PersistOptions } from 'zustand/middleware';
-import { SetState, GetState, StoreCreateApi } from '../types';
+import { StateCreatorMiddware } from '../types';
 
 export type {
     PersistOptions
 };
 
 export type Persist = {
-    <T>(create: (
-        set: SetState,
-        get: GetState,
-        api: StoreCreateApi,
-    ) => T, options?: PersistOptions<T>): (set: SetState, get: GetState, api: StoreCreateApi) => T
+    <T extends {}>(create: StateCreatorMiddware<T>, options?: PersistOptions<T>): StateCreatorMiddware<T>,
 };
 
 const persist: Persist = (fn, options?) => {
@@ -21,7 +17,7 @@ const persist: Persist = (fn, options?) => {
     return result as any;
 };
 
-const wrapper = (options?) => {
+const wrapper = (options: PersistOptions<any>) => {
     return (fn) => {
         return persist(fn, options);
     }

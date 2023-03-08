@@ -1,6 +1,7 @@
 import { create as createZustand } from 'zustand';
 import { useCallback } from 'react';
 import { shallow } from 'zustand/shallow';
+import setMiddleware from './middlewares/setMiddware';
 import {
     Create,
     UseStore,
@@ -8,6 +9,7 @@ import {
     StoreApi,
     StateCreatorTs,
     Convert,
+    SetState,
     StateCreatorMiddware
 } from './types';
 import getSuspense from './getStoreSuspense';
@@ -25,6 +27,8 @@ const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: Options)
     
     let createFn = collect<T>(func, computedCaches, suspenseCaches) as StateCreatorMiddware<T>;
 
+    createFn = setMiddleware(createFn);
+
     options?.middwares?.forEach((middware) => {
         createFn = middware(createFn);
     });
@@ -36,7 +40,7 @@ const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: Options)
     // 单独将 store 的方法导出
     const store: StoreApi<Convert<T>> = {
         getState: getWrapper(useZustandStore.getState),
-        setState: useZustandStore.setState,
+        setState: useZustandStore.setState as SetState<Convert<T>>,
         subscribe: useZustandStore.subscribe,
     };
 
@@ -79,12 +83,12 @@ const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: Options)
                         if (f in state) {
                             store.setState({
                                 [f]: v(store.getState()[f])
-                            } as Partial<Convert<T>>);
+                            } as Partial<Convert<T>>, `setState: ${f}`);
                         }
                     } else {
                         store.setState({
                             [f]: v
-                        } as Partial<Convert<T>>);
+                        } as Partial<Convert<T>>, `setState: ${f}`);
                     }
                 };
                 setState = lazySetActions[f];

@@ -74,7 +74,7 @@ const getSuspense = ({
                                 refresh: createPromise,
                             }
                         }
-                    });
+                    }, `suspense value:${String(key)} fullfilled`);
                 }).catch((e) => {
                     state[cacheKeyValue] = {
                         ...state[cacheKeyValue],
@@ -93,7 +93,7 @@ const getSuspense = ({
                                 refresh: createPromise,
                             }
                         }
-                    })
+                    }, `suspense value:${String(key)} rejected`)
                 }),
                 refresh: createPromise,
                 force,
@@ -114,7 +114,7 @@ const getSuspense = ({
                             refresh: createPromise,
                         }
                     }
-                })
+                }, `suspense value:${String(key)} start or refresh`)
             });
             return new Promise((resolve, reject) => state[cacheKeyValue].cache.then(() => {
                 const temp = state[cacheKeyValue];
@@ -135,6 +135,8 @@ const getSuspense = ({
 
         const { cache, fullfilledOnce, force, error, fromLocal, fromServer } = state[cacheKey];
         const { loadable, manual } = options;
+
+        console.log(key, loadable);
 
         if (loadable && !force) {
             if (!cache && !manual) {

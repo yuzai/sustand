@@ -4,14 +4,14 @@ import {
     Convert,
     SetState,
     GetState,
-    StoreApi
+    StoreApi,
 } from '../types';
 
 const collect = <T extends {}>(
     func: StateCreatorTs<T>,
     computedCaches,
     suspenseCaches
-) => (set: SetState<T>, get: GetState<T>, api: StoreApi<T>): Convert<T> => {
+) => (set: SetState<Convert<T>>, get: GetState<Convert<T>>, api: StoreApi<Convert<T>>): Convert<T> => {
     const state = func(set, get, api);
     Object.keys(state).forEach((key) => {
         if (state[key] && state[key].sustand_internal_iscomputed) {

@@ -69,7 +69,8 @@ export type UseStoreSuspense<T> = {
 export type SetState<T> = {
     (
         partial: T | Partial<T> | ((state: T) => T | Partial<T>),
-        replace?: boolean | undefined
+        desc?: string,
+        replace?: boolean
     ): void
 }
 

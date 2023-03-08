@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "webpack serve --config ./demo/webpack/main.config.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "babel src -d lib --extensions '.ts'",
+    "build": "tsc && npm run build:es && npm run build:cjs",
+    "build:es": "NODE_ENV=es babel src -d es --extensions '.ts'",
+    "build:cjs": "NODE_ENV=commonjs babel src -d lib --extensions '.ts'",
     "types": "tsc"
   },
   "keywords": [],

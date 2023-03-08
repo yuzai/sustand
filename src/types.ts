@@ -86,12 +86,12 @@ export type StoreApi<T> = {
     getState: GetState<T>,
     setState: SetState<T>,
     subscribe: (listener: ((state: T, prevState: T) => void)) => () => void,
-    subscribeWithSelector?: (
-        selector: (states: T) => any,
-        listener: (cur: any, pre: any) => any,
+    subscribeWithSelector?: <S>(
+        selector: (states: T) => S,
+        listener: (cur: S, pre: S) => void,
         options?: {
             fireImmediately?: boolean,
-            equalityFn?: (cur: T | Partial<T> | any, pre: T | Partial<T> | any) => boolean,
+            equalityFn?: (cur: S | Partial<S> | any, pre: S | Partial<S> | any) => boolean,
         }
     ) => void,
 };

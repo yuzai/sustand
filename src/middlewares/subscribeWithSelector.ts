@@ -1,18 +1,14 @@
 import { shallow } from 'zustand/shallow';
-import { SetState, GetState, StoreCreateApi } from '../types';
+import { StateCreatorMiddware } from '../types';
 
 type SubscribeMiddware = {
-    <T>(create: (
-        set: SetState,
-        get: GetState,
-        api: StoreCreateApi,
-    ) => T): (set: SetState, get: GetState, api: StoreCreateApi) => T
+    <T extends {}>(create: StateCreatorMiddware<T>): StateCreatorMiddware<T>,
 };
 
 const subscribeWithSelector: SubscribeMiddware = (fn) => (
-    set: SetState,
-    get: GetState,
-    api: StoreCreateApi
+    set,
+    get,
+    api
 ) => {
     type S = ReturnType<typeof fn>;
     type Listener = (state: S, previousState: S) => void;

@@ -10,7 +10,7 @@ const getSuspense = ({
         const config = suspenseCaches[key];
         const optionsRef = useRef(options);
         optionsRef.current = options;
-        const cacheKey = JSON.stringify(options.args);
+        const cacheKey = JSON.stringify(options.args || 'default');
         const state = config.state;
 
         let createPromise: (force?: boolean) => Promise<any>;
@@ -47,7 +47,7 @@ const getSuspense = ({
         }
 
         createPromise = useCallback((force = false) => {
-            const cacheKeyRef = optionsRef.current.args;
+            const cacheKeyRef = optionsRef.current.args || 'default';
             const cacheKeyValue = JSON.stringify(cacheKeyRef);
             const s = {
                 status: 'pending',

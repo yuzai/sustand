@@ -1,20 +1,18 @@
 import React, { useState } from 'react';
-import { useStore } from '../store';
+import { useStore } from '../contextstore';
 import { useRenderTimes } from '../hook';
 
 export default () => {
     const renderTimes = useRenderTimes();
 
-    const [gameInfo, changeUserAGender] = useStore(state => [state.gameInfo, state.changeUserAGender]);
-
-    // console.log(gameInfo);
+    const count = useStore((state) => state);
 
     return (
         <div className="child">
             <h1>case7</h1>
             <p>component renderTimes: { renderTimes }</p>
-            <p>count: {gameInfo.userA.baseInfo.gender}</p>
-            <button onClick={() => changeUserAGender('hhh')}>{`changeUserAGender('hhh')`}</button>
+            <p>count: {JSON.stringify(count)}</p>
+            {/* <button onClick={() => changeUserAGender('hhh')}>{`changeUserAGender('hhh')`}</button> */}
         </div>
     )
 }

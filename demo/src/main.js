@@ -6,7 +6,7 @@ import T3 from './components/T3';
 import T4 from './components/T4';
 import T5 from './components/T5';
 import T6 from './components/T6';
-// import T7 from './components/T7';
+import T7 from './components/T7';
 
 export default () => {
     const [state, setState] = useState(0);
@@ -16,7 +16,7 @@ export default () => {
 
             <T2 />
 
-            {/* <T7 /> */}
+            <T7 />
             <T3 />
 
             <Suspense fallback={<div className="child">loading</div>}>

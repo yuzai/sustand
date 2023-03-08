@@ -10,7 +10,7 @@ import {
 let wrapper = memoize;
 
 // 当不支持 proxy 时，直接走透传逻辑
-if (!window.Proxy) {
+if (typeof window !== 'undefined' && !window?.Proxy) {
     wrapper = (fn) => fn;
 }
 

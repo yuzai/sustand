@@ -25,7 +25,7 @@ const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: Options)
     const suspenseCaches = {};
     const lazySetActions = {};
     
-    let createFn = collect<T>(func, computedCaches, suspenseCaches) as StateCreatorMiddware<T>;
+    let createFn = collect<T>(func, computedCaches, suspenseCaches);
 
     createFn = setMiddleware(createFn);
 

@@ -1,4 +1,12 @@
-import create, { devtools, compute, Computed, Suspensed, suspense, persist } from "sustand";
+import create, {
+    devtools,
+    compute,
+    Computed,
+    Suspensed,
+    suspense,
+    persist,
+    StateCreatorTs,
+} from "sustand";
 
 interface Store {
     a: number,
@@ -12,7 +20,7 @@ interface Store {
     suspenseV1: Suspensed<Store, number>,
 }
 
-const { store, useStore, useStoreSuspense, useStoreLoadable } = create<Store>()((set, get) => ({
+const storeSlice: StateCreatorTs<StoreB & Store, Store> = (set, get) => ({
     a: 1,
     b: 2,
     d: () => {
@@ -43,24 +51,43 @@ const { store, useStore, useStoreSuspense, useStoreLoadable } = create<Store>()(
             }, 1000)
         })
     }),
-}), {
-    middwares: [
-        persist({
-            name: 'qqqq',
-        }),
-        devtools({
-            name: 'ttt',
-        }),
-    ]
 });
 
+interface StoreB {
+    a: number,
+    b: number,
+    d: Function,
+    q: {
+        data: number,
+    },
+    sumAB: Computed<Store, number>,
+    // sumABAB: Computed<Store, number>,
+    suspenseV1: Suspensed<Store, number>,
+}
 
-const s = store.getState('sumAB')
+const createSliceB:StateCreatorTs<StoreB & Store, StoreB> = (set, get) => ({
+    a: 1,
+    b: 2,
+    d: () => {},
+    q: {
+        data: 2,
+    },
+    sumAB: compute(
+        state => state.a + state.b
+    ),
+    suspenseV1: suspense(() => {
+        const res = get('f');
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(100);
+            }, 1000)
+        })
+    }),
+});
 
-const d = store.getState('suspenseV1');
+type D = StoreB & Store;
 
-const all = store.getState();
-
-const res = useStoreLoadable('suspenseV1');
-
-const a = useStore(state => state.suspenseV1.test.data)
+const { useStore } = create<StoreB & Store>()((...a) => ({
+    ...createSliceB(...a),
+    ...storeSlice(...a),
+}));

@@ -183,6 +183,7 @@ const getSuspense = ({
                     pre[key] = computedCaches[key].action(temp);
                     computedCaches[key].data = pre[key];
                 });
+                pre[key][cacheKey] = temp[key][cacheKey];
             }
             return {
                 error,

@@ -18,7 +18,7 @@ const getSuspense = ({
 
         const cacheFromServer = typeof window === 'undefined' ? {}
             // eslint-disable-next-line
-            : window?.__ssrstreamingdata__?.[JSON.stringify([key, cacheKey])] || {};
+            : window?.__ssrstreamingdata__?.[key + cacheKey] || {};
 
         if (!state[cacheKey]) {
             const fromLocal = !!store.getState(key)[cacheKey]?.data;
@@ -153,7 +153,7 @@ const getSuspense = ({
             dangerouslySetInnerHTML: {
                 __html: `<script>
                     window.__ssrstreamingdata__ = window.__ssrstreamingdata__ || {};
-                    window.__ssrstreamingdata__[JSON.stringify(${[key, cacheKey]})] = ${JSON.stringify({
+                    window.__ssrstreamingdata__['${key + cacheKey}'] = ${JSON.stringify({
     data: state[cacheKey].data,
     status: state[cacheKey].status,
     fromServer: true,

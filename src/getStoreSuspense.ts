@@ -163,18 +163,27 @@ const getSuspense = ({
         });
 
         if (fromServer && typeof window !== 'undefined') {
-            // 如果是来自于服务端渲染，那么需要静默的同步到 state 中
-            const temp = store.getState();
-            temp[cacheKey] = {
-                error,
-                data: state[cacheKey].data,
-                status: state[cacheKey].status,
-                refresh: createPromise,
+            if (!state[cacheKey].hydrated) {
+                state[cacheKey].hydrated = true;
+                // 如果是来自于服务端渲染，那么需要静默的同步到 state 中
+                const pre = store.getState();
+                const temp = {
+                    ...pre,
+                    [key]: {
+                        ...pre[key],
+                        [cacheKey]: {
+                            error,
+                            data: state[cacheKey].data,
+                            status: state[cacheKey].status,
+                            refresh: createPromise,
+                        }
+                    }
+                }
+                Object.keys(computedCaches).forEach((key) => {
+                    pre[key] = computedCaches[key].action(temp);
+                    computedCaches[key].data = pre[key];
+                });
             }
-            Object.keys(computedCaches).forEach((key) => {
-                state[key] = computedCaches[key].action(temp);
-                computedCaches[key].data = state[key];
-            });
             return {
                 error,
                 data: state[cacheKey].data,

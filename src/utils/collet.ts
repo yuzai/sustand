@@ -7,7 +7,9 @@ import {
     StoreApi,
 } from '../types';
 
-let wrapper = memoize;
+let wrapper = (fn) => memoize(fn, {
+    noWeakMap: true,
+});
 
 // 当不支持 proxy 时，直接走透传逻辑
 if (typeof window !== 'undefined' && !window?.Proxy) {

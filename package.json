@@ -18,7 +18,8 @@
     "build:es": "NODE_ENV=es babel src -d es --extensions '.ts'",
     "build:cjs": "NODE_ENV=commonjs babel src -d lib --extensions '.ts'",
     "types": "tsc -p tsconfig.build.json",
-    "clean": "rm -rf lib types es"
+    "clean": "rm -rf lib types es",
+    "preversion": "npm run build"
   },
   "keywords": [],
   "author": "",

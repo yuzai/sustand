@@ -1,3 +1,4 @@
+import 'react';
 import create, {
     devtools,
     compute,
@@ -6,6 +7,7 @@ import create, {
     suspense,
     persist,
     StateCreatorTs,
+    createContext,
 } from "sustand";
 
 interface Store {
@@ -87,7 +89,11 @@ const createSliceB:StateCreatorTs<StoreB & Store, StoreB> = (set, get) => ({
 
 type D = StoreB & Store;
 
-const { useStore } = create<StoreB & Store>()((...a) => ({
+const { useStore, } = create<StoreB & Store>()((...a) => ({
     ...createSliceB(...a),
     ...storeSlice(...a),
 }));
+
+const { useStore: uuu, Provider } = createContext<Store>();
+
+const res = uuu('sumAB')

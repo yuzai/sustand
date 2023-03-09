@@ -2,51 +2,51 @@ import {
     createContext as reactCreateContext,
     useContext,
 } from 'react';
-import { UseStore, UseStoreSuspense, StoreApi } from './types';
+import { UseStore, UseStoreSuspense, StoreApi, Convert } from './types';
 
-const createContext = <T>() => {
-    const context = reactCreateContext<any>(undefined);
+const createContext = <T extends {}>() => {
+    const context = reactCreateContext<{
+        useStore?: UseStore<Convert<T>>,
+        useStoreSuspense?: UseStoreSuspense<T>,
+        useStoreLoadable?: UseStoreSuspense<T>,
+        store?: StoreApi<T>,
+    }>({});
 
     const Provider = context.Provider;
 
-    const useStore: UseStore<T> = (...args: any[]) => {
+    const useStore: UseStore<Convert<T>> = (f, compare?): any => {
         const value = useContext(context);
-        if (!value) {
-            throw new Error('provider not exist');
+        if (value.useStore) {
+            return value.useStore(f, compare);
         }
-        return value.useStore(...args);
+        throw new Error('provider not exist');
     };
 
-    const useStoreLoadable:UseStoreSuspense<T> = (...args) => {
+    const useStoreLoadable: UseStoreSuspense<T> = (...args) => {
         const value = useContext(context);
-        if (!value) {
-            throw new Error('provider not exist');
+        if (value.useStoreLoadable) {
+            return value.useStoreLoadable(...args);
         }
-        return value.useStoreLoadable(...args);
+        throw new Error('provider not exist');
     };
 
     const useStoreSuspense:UseStoreSuspense<T> = (...args) => {
         const value = useContext(context);
-        if (!value) {
-            throw new Error('provider not exist');
+        if (value.useStoreSuspense) {
+            return value.useStoreSuspense(...args);
         }
-        return value.useStoreSuspense(...args);
+        throw new Error('provider not exist');
     };
 
-    const useStoreComputed = (...args) => {
+    const getStore:() => StoreApi<T> | undefined = () => {
         const value = useContext(context);
         if (!value) {
             throw new Error('provider not exist');
         }
-        return value.useStoreComputed(...args);
-    };
-
-    const getStore:() => StoreApi<T> = () => {
-        const value = useContext(context);
-        if (!value) {
-            throw new Error('provider not exist');
+        if (value.store) {
+            return value.store;
         }
-        return value.store;
+        throw new Error('provider not exist');
     };
 
     return {
@@ -54,7 +54,6 @@ const createContext = <T>() => {
         useStore,
         useStoreLoadable,
         useStoreSuspense,
-        useStoreComputed,
         getStore,
     };
 };

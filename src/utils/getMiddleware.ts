@@ -1,19 +1,27 @@
-import getWrapper from './getWrapper';
+import { GetWrapper } from '../types';
 
-const getCache = (get: any, suspenseCaches: any) => (key, inputs = null) => {
-    const res = get(key);
-
-    if (res && res.sustand_internal_issuspense) {
-        return suspenseCaches.get(JSON.stringify([key, inputs]))?.getState();
+// 增强原来的 get 方法的能力，支持 'key' 和 函数的 形式
+const getWrapper: GetWrapper = (get: any) => (param?: any) => {
+    if (typeof param === 'string') {
+        return get()[param];
     }
-
-    return res;
+    if (typeof param === 'function') {
+        return param(get());
+    }
+    return get();
 };
 
-const getMiddleware = (func: any, suspenseCaches: any) => (set: any, get: any, api: any) => {
-    const states = func(set, getCache(getWrapper(get), suspenseCaches), api);
+
+const getMiddleware = (func) => (_, get, api) => {
+    const originGetState = api.getState;
+
+    // eslint-disable-next-line
+    api.getState = getWrapper(originGetState);
+
+    const states = func(_, api.getState, api);
 
     return states;
 };
 
 export default getMiddleware;
+

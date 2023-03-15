@@ -9,7 +9,7 @@ const { useStore, useStoreSuspense, store, useStoreLoadable } = create(
         setCountD: (f) => {
             if (typeof f === 'function') {
                 set({
-                    countd: f(get().countd),
+                    countd: f(get('countd')),
                 }, 'test');
             } else {
                 set({
@@ -65,7 +65,7 @@ export {
 const s = store.getState();
 
 setTimeout(() => {
-    console.log(store.setState);
+    console.log(store.getState('counta'));
 }, 200);
 // const d = useStore(state => state.sumCountAB);
 

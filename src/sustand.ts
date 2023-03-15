@@ -10,11 +10,12 @@ import {
     StateCreatorTs,
     Convert,
     SetState,
+    GetState,
     StateCreatorMiddware
 } from './types';
 import getSuspense from './getStoreSuspense';
 import collect from './utils/collet';
-import getWrapper from './utils/getWrapper';
+import getMiddleware from './utils/getMiddleware';
 
 type Options = {
     middwares?: (<T extends {}>(fn: StateCreatorMiddware<T>) => StateCreatorMiddware<T>)[]
@@ -29,6 +30,8 @@ const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: Options)
 
     createFn = setMiddleware(createFn);
 
+    createFn = getMiddleware(createFn);
+
     options?.middwares?.forEach((middware) => {
         createFn = middware(createFn);
     });
@@ -39,7 +42,7 @@ const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: Options)
 
     // 单独将 store 的方法导出
     const store: StoreApi<Convert<T>> = {
-        getState: getWrapper(useZustandStore.getState),
+        getState: useZustandStore.getState as GetState<Convert<T>>,
         setState: useZustandStore.setState as SetState<Convert<T>>,
         subscribe: useZustandStore.subscribe,
     };

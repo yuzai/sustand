@@ -18,7 +18,7 @@ import getSuspense from './getStoreSuspense';
 import collect from './utils/collet';
 import getMiddleware from './utils/getMiddleware';
 
-const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: CreateOptions) => {
+const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: CreateOptions<Convert<T>>) => {
     const computedCaches = {};
     const suspenseCaches = {};
     const lazySetActions = {};
@@ -116,7 +116,7 @@ const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: CreateOp
     };
 }
 
-const create = (<T extends {}>(createState?: StateCreatorTs<Convert<T>>, options?: CreateOptions) =>
+const create = (<T extends {}>(createState?: StateCreatorTs<T>, options?: CreateOptions<Convert<T>>) =>
     createState ? createSustand(createState, options) : createSustand) as Create;
 
 export default create;

@@ -106,19 +106,19 @@ export type StateCreatorMiddware<T extends {}> = (set: SetState<T>, get: GetStat
 /** 为本项目准备的类型声明 */
 export type StateCreatorTs<T extends {}, S = T> = (set: SetState<Convert<S & T>>, get: GetState<Convert<S & T>>, api: StoreApi<Convert<S & T>>) => S;
 
-export type CreateOptions = {
-    middwares?: (<T extends {}>(fn: StateCreatorMiddware<T>) => StateCreatorMiddware<T>)[]
+export type CreateOptions<T extends {}> = {
+    middwares?: ((fn: StateCreatorMiddware<T>) => StateCreatorMiddware<T>)[]
 }
 
 /** 创建 store */
 export type Create = {
-    <T extends {}>(create: StateCreator<T>, opts?: CreateOptions): {
+    <T extends {}>(create: StateCreator<T>, opts?: CreateOptions<any>): {
         useStore: UseStore<T>,
         useStoreSuspense: UseStoreSuspense<T>,
         useStoreLoadable: UseStoreLoadable<T>,
         store: StoreApi<Convert<T>>
     },
-    <T extends {}>(): (create: StateCreatorTs<T>, opts?: CreateOptions) => {
+    <T extends {}>(): (create: StateCreatorTs<T>, opts?: CreateOptions<Convert<T>>) => {
         useStore: UseStore<T>,
         useStoreSuspense: UseStoreSuspense<T>,
         useStoreLoadable: UseStoreLoadable<T>,

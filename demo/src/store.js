@@ -65,11 +65,11 @@ export {
 const s = store.getState();
 
 setTimeout(() => {
-    console.log(store.getState('counta'));
+    console.log(store.getState());
 }, 200);
 // const d = useStore(state => state.sumCountAB);
 
 // const susp = useStoreSuspense('suspense2');
 
-// useStore('');
+// const res = useStore(state => state.sumCountAB);
 

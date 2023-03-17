@@ -13,6 +13,8 @@ import {
     GetState,
     UseStoreLoadable,
     CreateOptions,
+    FilterComputedKey,
+    FilterSuspenseKey,
 } from './types';
 import getSuspense from './getStoreSuspense';
 import collect from './utils/collet';
@@ -72,13 +74,19 @@ const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: CreateOp
         })
     }
 
-    const useStore: UseStore<T> = (f?, equalityFn?): any => {
+    const useStore: UseStore<T> = (f?, equalityFn?):any => {
         let fn = f;
         // 比较函数默认全部 shallow
         let isEqual = equalityFn || shallow;
         // useStore('key') 时，将比较函数整理成仅比较 state
         const equalityFnData = useCallback((a, b) => shallow(a[0], b[0]), []);
         if (typeof f === 'string') {
+            if (computedCaches[f]) {
+                return store.getState(f as FilterComputedKey<T>);
+            }
+            if (suspenseCaches[f]) {
+                return useStoreSuspense(f as FilterSuspenseKey<T>, equalityFn);
+            } 
             const state = store.getState();
             let setState = lazySetActions[f];
             if (!setState) {

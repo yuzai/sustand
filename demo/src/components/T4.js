@@ -12,7 +12,7 @@ export default ({
         data,
         status,
         refresh,
-    } = useStoreSuspense('suspense1', {
+    } = useStore('suspense1', {
         // loadable: true,
         // manual: true,
         // args: {

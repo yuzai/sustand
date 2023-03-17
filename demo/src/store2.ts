@@ -19,7 +19,7 @@ interface Store {
     },
     sumAB: Computed<Store, number>,
     sumABAB: Computed<Store, number>,
-    suspenseV1: Suspensed<Store, number>,
+    suspenseV1: Suspensed<Store, string>,
 }
 
 const storeSlice: StateCreatorTs<StoreB & Store, Store> = (set, get) => ({
@@ -49,7 +49,7 @@ const storeSlice: StateCreatorTs<StoreB & Store, Store> = (set, get) => ({
         const res = get('f')
         return new Promise((resolve) => {
             setTimeout(() => {
-                resolve(100);
+                resolve('100');
             }, 1000)
         })
     }, {
@@ -67,7 +67,7 @@ interface StoreB {
     },
     sumAB: Computed<Store, number>,
     // sumABAB: Computed<Store, number>,
-    suspenseV1: Suspensed<Store, number>,
+    suspenseV2: Suspensed<Store, number>,
 }
 
 const createSliceB:StateCreatorTs<StoreB & Store, StoreB> = (set, get) => ({
@@ -80,7 +80,7 @@ const createSliceB:StateCreatorTs<StoreB & Store, StoreB> = (set, get) => ({
     sumAB: compute(
         state => state.a + state.b
     ),
-    suspenseV1: suspense(() => {
+    suspenseV2: suspense(() => {
         const res = get('f');
         return new Promise((resolve) => {
             setTimeout(() => {
@@ -101,4 +101,6 @@ const { useStore: uuu, Provider } = createContext<Store>();
 
 // const res = uuu('sumAB')
 
-// const res = useStoreLoadable('suspenseV1')
+const res = useStore('suspenseV1')
+
+const res = useStore('suspenseV2')

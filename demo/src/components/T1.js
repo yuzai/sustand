@@ -7,7 +7,7 @@ export default () => {
 
     const [count, setCount] = useStore('counta');
 
-    const sumAB = useStore((state) => state.sumCountAB);
+    const sumAB = useStore('sumCountAB');
 
     return (
         <div className="child">

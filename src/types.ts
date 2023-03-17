@@ -42,13 +42,6 @@ export type SuspensedConvert<T> = {
 /** 比较器函数 */
 export type EqualityFn<T> = (preState: T, nextState: T) => boolean;
 
-/** 获取普通状态 */
-export type UseStore<T> = {
-    <F extends (state: Convert<T>) => any>(selector: F, equalityFn?: EqualityFn<ReturnType<F>>): ReturnType<F>;
-    <K extends FilterNormalKey<T> | FilterComputedKey<T>>(key: K, equalityFn?: EqualityFn<T[K]>):
-    [state: T[K], setState: T[K] | ((state: T[K]) => T[K])];
-};
-
 export type UseStoreSuspense<T, O = {
     args?: any,
     manual?: boolean,
@@ -66,6 +59,25 @@ export type UseStoreLoadable<T> = UseStoreSuspense<T, {
     args?: any,
     manual?: boolean,
 }>;
+
+/** 获取普通状态 */
+export type UseStore<T> = {
+    <F extends (state: Convert<T>) => any>(selector: F, equalityFn?: EqualityFn<ReturnType<F>>): ReturnType<F>;
+    <K extends FilterNormalKey<T>>(key: K, equalityFn?: EqualityFn<T[K]>):
+    [state: T[K], setState: T[K] | ((state: T[K]) => T[K])];
+    <K extends FilterComputedKey<T>>(key: K, equalityFn?: EqualityFn<T[K]>): Convert<T>[K],
+    <S extends SuspensedConvert<T>, K extends keyof S>(key: K, options?: {
+        args?: any,
+        manual?: boolean,
+        loadable?: boolean,
+    }): {
+        data: S[K]['data'],
+        status: Status,
+        error: any,
+        refresh: (force?: boolean) => Promise<S[K]['data']>,
+        loadScript: undefined | React.DetailedReactHTMLElement<{ dangerouslySetInnerHTML: { __html: string; }; }, HTMLElement>,
+    }
+};
 
 export type SetState<T> = {
     (

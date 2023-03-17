@@ -146,6 +146,7 @@ const getSuspense = ({
                 data,
                 status,
                 refresh: createPromise,
+                loadScript: undefined,
             };
         }
 

@@ -89,7 +89,7 @@ const createSliceB:StateCreatorTs<StoreB & Store, StoreB> = (set, get) => ({
 
 type D = StoreB & Store;
 
-const { useStore, } = create<StoreB & Store>()((...a) => ({
+const { useStore, useStoreSuspense, useStoreLoadable } = create<StoreB & Store>()((...a) => ({
     ...createSliceB(...a),
     ...storeSlice(...a),
 }));
@@ -97,3 +97,5 @@ const { useStore, } = create<StoreB & Store>()((...a) => ({
 const { useStore: uuu, Provider } = createContext<Store>();
 
 const res = uuu('sumAB')
+
+const res = useStoreLoadable('suspenseV1')

@@ -11,7 +11,8 @@ import {
     Convert,
     SetState,
     GetState,
-    StateCreatorMiddware
+    StateCreatorMiddware,
+    UseStoreLoadable
 } from './types';
 import getSuspense from './getStoreSuspense';
 import collect from './utils/collet';
@@ -61,7 +62,7 @@ const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: Options)
         computedCaches,
     });
 
-    const useStoreLoadable = (key: string, options?) => {
+    const useStoreLoadable: UseStoreLoadable<T> = (key, options?) => {
         return getSuspense({
             store,
             useZustandStore,

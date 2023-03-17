@@ -11,60 +11,61 @@ export type Convert<T> = {
                         data: Awaited<ReturnType<T[property]["action"]>>,
                         status: Status,
                         error: any,
-                        refresh: (force?: boolean) => Promise<any>,
+                        refresh: (force?: boolean) => Promise<Awaited<ReturnType<T[property]["action"]>>>,
                     }
                 } : T[property]
 }
 
+/** 筛选满足 C 的 keys */
+type Filter<T, C> = {
+    [P in keyof T]: T[P] extends C ? P : never
+}[keyof T];
+
+/** 筛选 suspense 的 keys */
+export type FilterSuspenseKey<T> = Filter<T, { action: (...args: any) => any, sustand_internal_issuspense: boolean }>;
+
+/** 筛选 computed 的 keys */
+export type FilterComputedKey<T> = Filter<T, { action: (...args: any) => any, sustand_internal_iscomputed: boolean }>;
+
+/** 筛选非 computed 和 非 suspense 的keys */
+export type FilterNormalKey<T> = Exclude<keyof T, FilterSuspenseKey<T> | FilterComputedKey<T>>;
+
 /** 标记 suspense 的原始类型 */
 export type SuspensedConvert<T> = {
-    [property in keyof T]: T[property] extends { action: (...args: any) => any, sustand_internal_issuspense: boolean } ? {
-        data: Awaited<ReturnType<T[property]["action"]>>,
+    [P in FilterSuspenseKey<T>]: {
+        // TODO: 此处不知为何 ts 没有自动识别出来 T[P] 一定是具有 action 属性的
+        data: T[P] extends { action: (...args: any) => any } ? Awaited<ReturnType<T[P]["action"]>> : never,
         sustand_internal_issuspense: true,
-    } : T[property]
+    }
 }
 
 /** 比较器函数 */
 export type Compare<T> = (preState: T, nextState: T) => boolean;
 
-/** 选择器函数 */
-export type Selector<T, S> = (states: T) => S;
-
 /** 获取普通状态 */
 export type UseStore<T> = {
-    <S>(selector: Selector<T, S>, compare?: Compare<T>): S;
-    <K extends keyof T>(key: K, compare?: Compare<T>):
+    <F extends (state: Convert<T>) => any>(selector: F, compare?: Compare<ReturnType<F>>): ReturnType<F>;
+    <K extends FilterNormalKey<T> | FilterComputedKey<T>>(key: K, compare?: Compare<T[K]>):
     [state: T[K], setState: T[K] | ((state: T[K]) => T[K])];
 };
 
-/** 获取loadable */
-export type UseStoreLoadable<T> = {
-    <S extends SuspensedConvert<T>, K extends keyof S>(key: K, options?: {
-        args?: any,
-        manual?: boolean,
-    }):
-    {
-        data: S[K] extends { data: any, sustand_internal_issuspense: boolean } ? S[K]["data"] : never,
-        status: Status,
-        error: any,
-        refresh: (force?: boolean) => Promise<any>,
-    };
+export type UseStoreSuspense<T, O = {
+    args?: any,
+    manual?: boolean,
+    loadable?: boolean,
+}> = <S extends SuspensedConvert<T>, K extends keyof S>(key: K, options?: O) => {
+    data: S[K]['data'],
+    status: Status,
+    error: any,
+    refresh: (force?: boolean) => Promise<S[K]['data']>,
+    loadScript: undefined | React.DetailedReactHTMLElement<{ dangerouslySetInnerHTML: { __html: string; }; }, HTMLElement>,
 };
 
-/** 获取suspense */
-export type UseStoreSuspense<T> = {
-    <S extends SuspensedConvert<T>, K extends keyof S>(key: K, options?: {
-        args?: any,
-        manual?: boolean,
-        loadable?: boolean,
-    }):
-    {
-        data: S[K] extends { data: any, sustand_internal_issuspense: boolean } ? S[K]["data"] : never,
-        status: Status,
-        error: any,
-        refresh: (force?: boolean) => Promise<any>,
-    };
-};
+/** 获取loadable */
+export type UseStoreLoadable<T> = UseStoreSuspense<T, {
+    args?: any,
+    manual?: boolean,
+}>;
 
 export type SetState<T> = {
     (
@@ -76,7 +77,7 @@ export type SetState<T> = {
 
 export type GetState<T> = {
     <K extends keyof T>(key: K): T[K];
-    <S>(selector: (state: T) => S): S;
+    <F extends (...args: any[]) => any>(selector: F): ReturnType<F>;
     (): T,
 }
 
@@ -86,12 +87,12 @@ export type StoreApi<T> = {
     getState: GetState<T>,
     setState: SetState<T>,
     subscribe: (listener: ((state: T, prevState: T) => void)) => () => void,
-    subscribeWithSelector?: <S>(
-        selector: (states: T) => S,
+    subscribeWithSelector?: <F extends (state: T) => any, S extends ReturnType<F>>(
+        selector: F,
         listener: (cur: S, pre: S) => void,
         options?: {
             fireImmediately?: boolean,
-            equalityFn?: (cur: S | Partial<S> | any, pre: S | Partial<S> | any) => boolean,
+            equalityFn?: (cur: S, pre: S) => boolean,
         }
     ) => void,
 };
@@ -108,13 +109,13 @@ export type StateCreatorTs<T extends {}, S = T> = (set: SetState<Convert<S & T>>
 /** 创建 store */
 export type Create = {
     <T extends {}>(create: StateCreator<T>, opts?: any): {
-        useStore: UseStore<Convert<T>>,
+        useStore: UseStore<T>,
         useStoreSuspense: UseStoreSuspense<T>,
         useStoreLoadable: UseStoreLoadable<T>,
         store: StoreApi<Convert<T>>
     },
     <T extends {}>(): (create: StateCreatorTs<T>, opts?: any) => {
-        useStore: UseStore<Convert<T>>,
+        useStore: UseStore<T>,
         useStoreSuspense: UseStoreSuspense<T>,
         useStoreLoadable: UseStoreLoadable<T>,
         store: StoreApi<Convert<T>>
@@ -126,12 +127,12 @@ export type Computed<T, S> = {
     sustand_internal_iscomputed: boolean,
 }
 
-export type Suspensed<T, S> = {
+export type Suspensed<T, S, K extends (...args: any[]) => any = () => {}> = {
     action: (...args: any[]) => Promise<S>,
     sustand_internal_issuspense: boolean,
     initialValue?: S,
-    selector?: (state: Convert<T>) => any,
-    compare: (cur: Convert<T>, pre: Convert<T>) => boolean,
+    selector?: (state: Convert<T>) => ReturnType<K>,
+    compare: (cur: ReturnType<K>, pre: ReturnType<K>) => boolean,
 }
 
 declare global {

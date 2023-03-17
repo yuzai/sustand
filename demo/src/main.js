@@ -1,4 +1,5 @@
 import React, { Suspense, useState } from 'react';
+// import { Provider, createStore } from '@store';
 import './index.less';
 import T1 from './components/T1';
 import T2 from './components/T2';
@@ -10,33 +11,36 @@ import T7 from './components/T7';
 
 export default () => {
     const [state, setState] = useState(0);
+    // const value = createStore();
     return (
-        <div className="box">
-            <T1 />
+        // <Provider value={value}>
+            <div className="box">
+                <T1 />
 
-            <T2 />
+                <T2 />
 
-            <T7 />
-            <T3 />
+                <T7 />
+                <T3 />
 
-            <Suspense fallback={<div className="child">loading</div>}>
-                <T4 c={1} />
-            </Suspense>
-            <Suspense fallback={<div className="child">loading</div>}>
-                <T4 c={2} />
-            </Suspense>
-            <Suspense fallback={<div className="child">loading</div>}>
-                <T6 c={3} />
-            </Suspense>
-            <Suspense fallback={<div className="child">loading</div>}>
-                <T5 c={3} />
-            </Suspense>
-            <Suspense fallback={<div className="child">loading</div>}>
-                <T5 c={2} />
-            </Suspense>
-            <div className="child">
-                <button onClick={() => setState(pre => pre + 1)}>refresh</button>
+                <Suspense fallback={<div className="child">loading</div>}>
+                    <T4 c={1} />
+                </Suspense>
+                <Suspense fallback={<div className="child">loading</div>}>
+                    <T4 c={2} />
+                </Suspense>
+                <Suspense fallback={<div className="child">loading</div>}>
+                    <T6 c={3} />
+                </Suspense>
+                <Suspense fallback={<div className="child">loading</div>}>
+                    <T5 c={3} />
+                </Suspense>
+                <Suspense fallback={<div className="child">loading</div>}>
+                    <T5 c={2} />
+                </Suspense>
+                <div className="child">
+                    <button onClick={() => setState(pre => pre + 1)}>refresh</button>
+                </div>
             </div>
-        </div>
+        // </Provider>
     )
 };

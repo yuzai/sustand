@@ -105,7 +105,6 @@ const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: CreateOp
                 };
                 setState = lazySetActions[f];
             }
-            // TODO:如果选择的属性是函数 or suspense value，发出警告
             // 惰性生成 setState
             fn = (state) => [state[f], setState];
             isEqual = equalityFn || equalityFnData;

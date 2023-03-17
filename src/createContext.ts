@@ -6,15 +6,15 @@ import { UseStore, UseStoreSuspense, StoreApi, Convert } from './types';
 
 const createContext = <T extends {}>() => {
     const context = reactCreateContext<{
-        useStore?: UseStore<Convert<T>>,
+        useStore?: UseStore<T>,
         useStoreSuspense?: UseStoreSuspense<T>,
         useStoreLoadable?: UseStoreSuspense<T>,
-        store?: StoreApi<T>,
+        store?: StoreApi<Convert<T>>,
     }>({});
 
     const Provider = context.Provider;
 
-    const useStore: UseStore<Convert<T>> = (f, equalityFn?): any => {
+    const useStore: UseStore<T> = (f, equalityFn?): any => {
         const value = useContext(context);
         if (value.useStore) {
             return value.useStore(f, equalityFn);
@@ -38,7 +38,7 @@ const createContext = <T extends {}>() => {
         throw new Error('provider not exist');
     };
 
-    const getStore:() => StoreApi<T> | undefined = () => {
+    const getStore:() => StoreApi<Convert<T>> | undefined = () => {
         const value = useContext(context);
         if (!value) {
             throw new Error('provider not exist');

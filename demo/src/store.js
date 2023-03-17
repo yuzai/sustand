@@ -69,7 +69,7 @@ setTimeout(() => {
 }, 200);
 // const d = useStore(state => state.sumCountAB);
 
-const susp = useStoreSuspense('');
+// const susp = useStoreSuspense('suspense2');
 
-useStore('');
+// useStore('');
 

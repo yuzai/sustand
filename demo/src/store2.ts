@@ -52,6 +52,9 @@ const storeSlice: StateCreatorTs<StoreB & Store, Store> = (set, get) => ({
                 resolve(100);
             }, 1000)
         })
+    }, {
+        selector: (state) => state.f,
+        compare: (a, b) => a === b,
     }),
 });
 

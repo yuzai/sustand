@@ -127,12 +127,12 @@ export type Computed<T, S> = {
     sustand_internal_iscomputed: boolean,
 }
 
-export type Suspensed<T, S, K extends (...args: any[]) => any = () => {}> = {
+export type Suspensed<T, S> = {
     action: (...args: any[]) => Promise<S>,
     sustand_internal_issuspense: boolean,
     initialValue?: S,
-    selector?: (state: Convert<T>) => ReturnType<K>,
-    compare: (cur: ReturnType<K>, pre: ReturnType<K>) => boolean,
+    selector?: (state: Convert<T>) => any,
+    compare: (cur: any, pre: any) => boolean,
 }
 
 declare global {

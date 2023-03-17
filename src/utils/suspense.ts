@@ -1,11 +1,11 @@
 import { shallow } from 'zustand/shallow';
 
-export default <T, S>(
+export default <T, S, R>(
     action: (...parmas: any[]) => Promise<S>,
     options: {
-        selector?: (state: T) => any,
-        initialValue?: any,
-        compare?: <T>(a: T, b: T) => boolean,
+        selector?: (state: T) => R,
+        initialValue?: S,
+        compare?: (a: R, b: R) => boolean,
     } = {}
 ) => ({
     action,

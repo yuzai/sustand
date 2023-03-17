@@ -31,7 +31,7 @@ const { useStore, useStoreSuspense, store, useStoreLoadable } = create(
             });
         }, {
             selector: (state) => [state.counta, state.countb],
-            compare: (a, b) => a[0] === b[0],
+            equalityFn: (a, b) => a[0] === b[0],
         }),
         suspense2: suspense((args) => {
             return new Promise((resolve, reject) => {

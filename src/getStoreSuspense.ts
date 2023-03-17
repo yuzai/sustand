@@ -39,8 +39,8 @@ const getSuspense = ({
                 store.subscribe((curState, preState) => {
                     const cur = config.selector(curState);
                     const pre = config.selector(preState);
-                    const compare = config.compare || shallow;
-                    if (!(compare(cur, pre))) {
+                    const equalityFn = config.equalityFn || shallow;
+                    if (!(equalityFn(cur, pre))) {
                         createPromise();
                     }
                 });

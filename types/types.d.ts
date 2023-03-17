@@ -27,13 +27,13 @@ export type SuspensedConvert<T> = {
     } : T[property];
 };
 /** 比较器函数 */
-export type Compare<T> = (preState: T, nextState: T) => boolean;
+export type EqualityFn<T> = (preState: T, nextState: T) => boolean;
 /** 选择器函数 */
 export type Selector<T, S> = (states: T) => S;
 /** 获取普通状态 */
 export type UseStore<T> = {
-    <S>(selector: Selector<T, S>, compare?: Compare<T>): S;
-    <K extends keyof T>(key: K, compare?: Compare<T>): [
+    <S>(selector: Selector<T, S>, compare?: EqualityFn<T>): S;
+    <K extends keyof T>(key: K, compare?: EqualityFn<T>): [
         state: T[K],
         setState: T[K] | ((state: T[K]) => T[K])
     ];

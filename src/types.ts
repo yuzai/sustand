@@ -40,12 +40,12 @@ export type SuspensedConvert<T> = {
 }
 
 /** 比较器函数 */
-export type Compare<T> = (preState: T, nextState: T) => boolean;
+export type EqualityFn<T> = (preState: T, nextState: T) => boolean;
 
 /** 获取普通状态 */
 export type UseStore<T> = {
-    <F extends (state: Convert<T>) => any>(selector: F, compare?: Compare<ReturnType<F>>): ReturnType<F>;
-    <K extends FilterNormalKey<T> | FilterComputedKey<T>>(key: K, compare?: Compare<T[K]>):
+    <F extends (state: Convert<T>) => any>(selector: F, equalityFn?: EqualityFn<ReturnType<F>>): ReturnType<F>;
+    <K extends FilterNormalKey<T> | FilterComputedKey<T>>(key: K, equalityFn?: EqualityFn<T[K]>):
     [state: T[K], setState: T[K] | ((state: T[K]) => T[K])];
 };
 
@@ -92,7 +92,7 @@ export type StoreApi<T> = {
         listener: (cur: S, pre: S) => void,
         options?: {
             fireImmediately?: boolean,
-            equalityFn?: (cur: S, pre: S) => boolean,
+            equalityFn?: EqualityFn<S>,
         }
     ) => void,
 };
@@ -106,15 +106,19 @@ export type StateCreatorMiddware<T extends {}> = (set: SetState<T>, get: GetStat
 /** 为本项目准备的类型声明 */
 export type StateCreatorTs<T extends {}, S = T> = (set: SetState<Convert<S & T>>, get: GetState<Convert<S & T>>, api: StoreApi<Convert<S & T>>) => S;
 
+export type CreateOptions = {
+    middwares?: (<T extends {}>(fn: StateCreatorMiddware<T>) => StateCreatorMiddware<T>)[]
+}
+
 /** 创建 store */
 export type Create = {
-    <T extends {}>(create: StateCreator<T>, opts?: any): {
+    <T extends {}>(create: StateCreator<T>, opts?: CreateOptions): {
         useStore: UseStore<T>,
         useStoreSuspense: UseStoreSuspense<T>,
         useStoreLoadable: UseStoreLoadable<T>,
         store: StoreApi<Convert<T>>
     },
-    <T extends {}>(): (create: StateCreatorTs<T>, opts?: any) => {
+    <T extends {}>(): (create: StateCreatorTs<T>, opts?: CreateOptions) => {
         useStore: UseStore<T>,
         useStoreSuspense: UseStoreSuspense<T>,
         useStoreLoadable: UseStoreLoadable<T>,
@@ -132,7 +136,7 @@ export type Suspensed<T, S> = {
     sustand_internal_issuspense: boolean,
     initialValue?: S,
     selector?: (state: Convert<T>) => any,
-    compare: (cur: any, pre: any) => boolean,
+    equalityFn: EqualityFn<any>,
 }
 
 declare global {

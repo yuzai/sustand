@@ -5,12 +5,12 @@ export default <T, S, R>(
     options: {
         selector?: (state: T) => R,
         initialValue?: S,
-        compare?: (a: R, b: R) => boolean,
+        equalityFn?: (a: R, b: R) => boolean,
     } = {}
 ) => ({
     action,
     selector: options.selector,
-    compare: options.compare || shallow,
+    equalityFn: options.equalityFn || shallow,
     initialValue: options.initialValue || undefined,
     sustand_internal_issuspense: true,
 });

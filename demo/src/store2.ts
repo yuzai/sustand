@@ -54,7 +54,7 @@ const storeSlice: StateCreatorTs<StoreB & Store, Store> = (set, get) => ({
         })
     }, {
         selector: (state) => state.f,
-        compare: (a, b) => a === b,
+        equalityFn: (a, b) => a === b,
     }),
 });
 
@@ -99,6 +99,6 @@ const { useStore, useStoreSuspense, useStoreLoadable } = create<StoreB & Store>(
 
 const { useStore: uuu, Provider } = createContext<Store>();
 
-const res = uuu('sumAB')
+// const res = uuu('sumAB')
 
-const res = useStoreLoadable('suspenseV1')
+// const res = useStoreLoadable('suspenseV1')

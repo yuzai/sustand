@@ -14,10 +14,10 @@ const createContext = <T extends {}>() => {
 
     const Provider = context.Provider;
 
-    const useStore: UseStore<Convert<T>> = (f, compare?): any => {
+    const useStore: UseStore<Convert<T>> = (f, equalityFn?): any => {
         const value = useContext(context);
         if (value.useStore) {
-            return value.useStore(f, compare);
+            return value.useStore(f, equalityFn);
         }
         throw new Error('provider not exist');
     };

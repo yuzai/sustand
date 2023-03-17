@@ -11,18 +11,14 @@ import {
     Convert,
     SetState,
     GetState,
-    StateCreatorMiddware,
-    UseStoreLoadable
+    UseStoreLoadable,
+    CreateOptions,
 } from './types';
 import getSuspense from './getStoreSuspense';
 import collect from './utils/collet';
 import getMiddleware from './utils/getMiddleware';
 
-type Options = {
-    middwares?: (<T extends {}>(fn: StateCreatorMiddware<T>) => StateCreatorMiddware<T>)[]
-}
-
-const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: Options) => {
+const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: CreateOptions) => {
     const computedCaches = {};
     const suspenseCaches = {};
     const lazySetActions = {};
@@ -43,7 +39,9 @@ const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: Options)
 
     // 单独将 store 的方法导出
     const store: StoreApi<Convert<T>> = {
+        // 用 as 进行强制类型转换，TODO: 参考 zustand mutators 写法修改类型
         getState: useZustandStore.getState as GetState<Convert<T>>,
+        // 用 as 进行强制类型转换
         setState: useZustandStore.setState as SetState<Convert<T>>,
         subscribe: useZustandStore.subscribe,
     };
@@ -74,12 +72,12 @@ const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: Options)
         })
     }
 
-    const useStore: UseStore<T> = (f?, compare?): any => {
+    const useStore: UseStore<T> = (f?, equalityFn?): any => {
         let fn = f;
         // 比较函数默认全部 shallow
-        let isEqual = compare || shallow;
+        let isEqual = equalityFn || shallow;
         // useStore('key') 时，将比较函数整理成仅比较 state
-        const compareData = useCallback((a, b) => shallow(a[0], b[0]), []);
+        const equalityFnData = useCallback((a, b) => shallow(a[0], b[0]), []);
         if (typeof f === 'string') {
             const state = store.getState();
             let setState = lazySetActions[f];
@@ -102,7 +100,7 @@ const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: Options)
             // TODO:如果选择的属性是函数 or suspense value，发出警告
             // 惰性生成 setState
             fn = (state) => [state[f], setState];
-            isEqual = compare || compareData;
+            isEqual = equalityFn || equalityFnData;
         }
         // 使用 zustand 的 useStore 完成状态生成
         const res = useZustandStore(fn, isEqual);
@@ -118,7 +116,7 @@ const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: Options)
     };
 }
 
-const create = (<T extends {}>(createState?: StateCreatorTs<Convert<T>>, options?: Options) =>
+const create = (<T extends {}>(createState?: StateCreatorTs<Convert<T>>, options?: CreateOptions) =>
     createState ? createSustand(createState, options) : createSustand) as Create;
 
 export default create;

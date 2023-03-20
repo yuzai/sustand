@@ -13,7 +13,6 @@ import {
     GetState,
     UseStoreLoadable,
     CreateOptions,
-    FilterComputedKey,
     FilterSuspenseKey,
 } from './types';
 import getSuspense from './getStoreSuspense';

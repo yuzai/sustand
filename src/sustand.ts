@@ -48,7 +48,6 @@ const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: CreateOp
     };
 
     store.subscribe((state) => {
-        console.log(1);
         Object.keys(computedCaches).forEach((key) => {
             state[key] = computedCaches[key].action(state);
             computedCaches[key].data = state[key];

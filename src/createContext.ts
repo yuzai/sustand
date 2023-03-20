@@ -4,6 +4,7 @@ import {
 } from 'react';
 import { UseStore, UseStoreSuspense, StoreApi, Convert } from './types';
 
+//@ts-ignore
 const createContext = <T extends {}>(fn?: () => T) => {
     const context = reactCreateContext<{
         useStore?: UseStore<T>,

@@ -9,7 +9,7 @@ declare const getSuspense: ({ store, useZustandStore, suspenseCaches, computedCa
     data: any;
     status: any;
     refresh: (force?: boolean) => Promise<any>;
-    loadScript?: undefined;
+    loadScript: undefined;
 } | {
     error: any;
     data: any;

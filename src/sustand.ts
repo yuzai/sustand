@@ -49,6 +49,7 @@ const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: CreateOp
     };
 
     store.subscribe((state) => {
+        console.log(1);
         Object.keys(computedCaches).forEach((key) => {
             state[key] = computedCaches[key].action(state);
             computedCaches[key].data = state[key];
@@ -82,7 +83,7 @@ const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: CreateOp
         const equalityFnData = useCallback((a, b) => shallow(a[0], b[0]), []);
         if (typeof f === 'string') {
             if (computedCaches[f]) {
-                return store.getState(f as FilterComputedKey<T>);
+                return useZustandStore(state => state[f], isEqual)
             }
             if (suspenseCaches[f]) {
                 return useStoreSuspense(f as FilterSuspenseKey<T>, equalityFn);

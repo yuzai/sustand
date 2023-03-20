@@ -5,15 +5,15 @@ export type Convert<T> = {
     [property in keyof T]: T[property] extends {
         action: (...args: any) => any;
         sustand_internal_iscomputed: boolean;
-    } ? ReturnType<T[property]["action"]> : T[property] extends {
+    } ? ReturnType<T[property]['action']> : T[property] extends {
         action: (...args: any) => any;
         sustand_internal_issuspense: boolean;
     } ? {
         [key: string]: {
-            data: Awaited<ReturnType<T[property]["action"]>>;
+            data: Awaited<ReturnType<T[property]['action']>>;
             status: Status;
             error: any;
-            refresh: (force?: boolean) => Promise<Awaited<ReturnType<T[property]["action"]>>>;
+            refresh: (force?: boolean) => Promise<Awaited<ReturnType<T[property]['action']>>>;
         };
     } : T[property];
 };
@@ -38,7 +38,7 @@ export type SuspensedConvert<T> = {
     [P in FilterSuspenseKey<T>]: {
         data: T[P] extends {
             action: (...args: any) => any;
-        } ? Awaited<ReturnType<T[P]["action"]>> : never;
+        } ? Awaited<ReturnType<T[P]['action']>> : never;
         sustand_internal_issuspense: true;
     };
 };
@@ -97,29 +97,29 @@ export type StoreApi<T> = {
     getState: GetState<T>;
     setState: SetState<T>;
     subscribe: (listener: ((state: T, prevState: T) => void)) => () => void;
-    subscribeWithSelector?: <F extends (state: T) => any, S extends ReturnType<F>>(selector: F, listener: (cur: S, pre: S) => void, options?: {
+    subscribeWithSelector: <F extends (state: T) => any, S extends ReturnType<F>>(selector: F, listener: (cur: S, pre: S) => void, options?: {
         fireImmediately?: boolean;
         equalityFn?: EqualityFn<S>;
     }) => void;
 };
 /** 为 js 准备的类型声明 */
-export type StateCreator<T> = (set: SetState<any>, get: GetState<any>, api: StoreApi<any>) => T;
+export type StateCreatorJs<T> = (set: SetState<any>, get: GetState<any>, api: StoreApi<any>) => T;
 /** 为原始 zustand 准备的类型声明 */
 export type StateCreatorMiddware<T extends {}> = (set: SetState<T>, get: GetState<T>, api: StoreApi<T>) => T;
 /** 为本项目准备的类型声明 */
-export type StateCreatorTs<T extends {}, S = T> = (set: SetState<Convert<S & T>>, get: GetState<Convert<S & T>>, api: StoreApi<Convert<S & T>>) => S;
+export type StateCreator<T extends {}, S = T> = (set: SetState<Convert<S & T>>, get: GetState<Convert<S & T>>, api: StoreApi<Convert<S & T>>) => S;
 export type CreateOptions<T extends {}> = {
     middwares?: ((fn: StateCreatorMiddware<T>) => StateCreatorMiddware<T>)[];
 };
 /** 创建 store */
 export type Create = {
-    <T extends {}>(create: StateCreator<T>, opts?: CreateOptions<any>): {
+    <T extends {}>(create: StateCreatorJs<T>, opts?: CreateOptions<any>): {
         useStore: UseStore<T>;
         useStoreSuspense: UseStoreSuspense<T>;
         useStoreLoadable: UseStoreLoadable<T>;
         store: StoreApi<Convert<T>>;
     };
-    <T extends {}>(): (create: StateCreatorTs<T>, opts?: CreateOptions<Convert<T>>) => {
+    <T extends {}>(): (create: StateCreator<T>, opts?: CreateOptions<Convert<T>>) => {
         useStore: UseStore<T>;
         useStoreSuspense: UseStoreSuspense<T>;
         useStoreLoadable: UseStoreLoadable<T>;

@@ -2,6 +2,7 @@ import { shallow } from 'zustand/shallow';
 import { StateCreatorMiddware } from '../types';
 
 type SubscribeMiddware = {
+    // eslint-disable-next-line @typescript-eslint/ban-types
     <T extends {}>(create: StateCreatorMiddware<T>): StateCreatorMiddware<T>,
 };
 

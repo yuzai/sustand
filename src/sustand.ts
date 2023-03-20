@@ -2,12 +2,13 @@ import { create as createZustand } from 'zustand';
 import { useCallback } from 'react';
 import { shallow } from 'zustand/shallow';
 import setMiddleware from './middlewares/setMiddware';
+import subscribeWithSelector from './middlewares/subscribeWithSelector';
 import {
     Create,
     UseStore,
     UseStoreSuspense,
     StoreApi,
-    StateCreatorTs,
+    StateCreator,
     Convert,
     SetState,
     GetState,
@@ -19,22 +20,28 @@ import getSuspense from './getStoreSuspense';
 import collect from './utils/collet';
 import getMiddleware from './utils/getMiddleware';
 
-const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: CreateOptions<Convert<T>>) => {
+// eslint-disable-next-line @typescript-eslint/ban-types
+const createSustand = <T extends {}>(
+    func: StateCreator<T>,
+    options?: CreateOptions<Convert<T>>
+) => {
     const computedCaches = {};
     const suspenseCaches = {};
     const lazySetActions = {};
-    
+
     let createFn = collect<T>(func, computedCaches, suspenseCaches);
 
     createFn = setMiddleware(createFn);
 
     createFn = getMiddleware(createFn);
 
+    createFn = subscribeWithSelector(createFn);
+
     options?.middwares?.forEach((middware) => {
         createFn = middware(createFn);
     });
 
-
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const useZustandStore = createZustand<Convert<T>>(createFn);
 
@@ -45,10 +52,13 @@ const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: CreateOp
         // 用 as 进行强制类型转换
         setState: useZustandStore.setState as SetState<Convert<T>>,
         subscribe: useZustandStore.subscribe,
+        // @ts-ignore
+        subscribeWithSelector: useZustandStore.subscribeWithSelector,
     };
 
     store.subscribe((state) => {
         Object.keys(computedCaches).forEach((key) => {
+            // eslint-disable-next-line no-param-reassign
             state[key] = computedCaches[key].action(state);
             computedCaches[key].data = state[key];
         });
@@ -61,17 +71,15 @@ const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: CreateOp
         computedCaches,
     });
 
-    const useStoreLoadable: UseStoreLoadable<T> = (key, options?) => {
-        return getSuspense({
-            store,
-            useZustandStore,
-            suspenseCaches,
-            computedCaches,
-        })(key, {
-            ...options,
-            loadable: true,
-        })
-    }
+    const useStoreLoadable: UseStoreLoadable<T> = (key, opts?) => getSuspense({
+        store,
+        useZustandStore,
+        suspenseCaches,
+        computedCaches,
+    })(key, {
+        ...opts,
+        loadable: true,
+    });
 
     const useStore: UseStore<T> = (f?, equalityFn?):any => {
         let fn = f;
@@ -81,14 +89,15 @@ const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: CreateOp
         const equalityFnData = useCallback((a, b) => shallow(a[0], b[0]), []);
         if (typeof f === 'string') {
             if (computedCaches[f]) {
-                return useZustandStore(state => state[f], isEqual)
+                return useZustandStore((state) => state[f], isEqual);
             }
             if (suspenseCaches[f]) {
                 return useStoreSuspense(f as FilterSuspenseKey<T>, equalityFn);
-            } 
+            }
             const state = store.getState();
             let setState = lazySetActions[f];
             if (!setState) {
+                // eslint-disable-next-line @typescript-eslint/ban-types
                 lazySetActions[f] = (v: Function | any) => {
                     if (typeof v === 'function') {
                         if (f in state) {
@@ -105,7 +114,7 @@ const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: CreateOp
                 setState = lazySetActions[f];
             }
             // 惰性生成 setState
-            fn = (state) => [state[f], setState];
+            fn = (s) => [s[f], setState];
             isEqual = equalityFn || equalityFnData;
         }
         // 使用 zustand 的 useStore 完成状态生成
@@ -120,10 +129,13 @@ const createSustand = <T extends {}>(func: StateCreatorTs<T>, options?: CreateOp
         useStoreLoadable,
         store,
     };
-}
+};
 
-const create = (<T extends {}>(createState?: StateCreatorTs<T>, options?: CreateOptions<Convert<T>>) =>
-    createState ? createSustand(createState, options) : createSustand) as Create;
+// eslint-disable-next-line @typescript-eslint/ban-types
+const create = (<T extends {}>(
+    createState?: StateCreator<T>,
+    options?: CreateOptions<Convert<T>>
+) => (createState ? createSustand(createState, options) : createSustand)
+) as Create;
 
 export default create;
-

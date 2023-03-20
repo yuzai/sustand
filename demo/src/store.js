@@ -109,6 +109,12 @@ const { useStore, useStoreSuspense, store, useStoreLoadable } = create(
     }
 );
 
+store.subscribeWithSelector((state) => state.counta, (cur, pre) => {
+    console.log(cur, pre);
+}, {
+    fireImmediately: true,
+});
+
 export {
     useStore,
     useStoreSuspense,

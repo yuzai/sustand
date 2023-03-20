@@ -2,9 +2,15 @@ import {
     createContext as reactCreateContext,
     useContext,
 } from 'react';
-import { UseStore, UseStoreSuspense, StoreApi, Convert } from './types';
+import {
+    UseStore,
+    UseStoreSuspense,
+    StoreApi,
+    Convert
+} from './types';
 
-//@ts-ignore
+// eslint-disable-next-line @typescript-eslint/ban-types
+// @ts-ignore
 const createContext = <T extends {}>(fn?: () => T) => {
     const context = reactCreateContext<{
         useStore?: UseStore<T>,

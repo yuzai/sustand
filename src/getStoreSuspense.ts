@@ -33,7 +33,7 @@ const getSuspense = ({
                 fromLocal,
                 fromServer: false,
                 ...cacheFromServer,
-            }
+            };
 
             if (config.selector && typeof config.selector === 'function') {
                 store.subscribe((curState, preState) => {
@@ -94,16 +94,16 @@ const getSuspense = ({
                                 refresh: createPromise,
                             }
                         }
-                    }, `suspense value:${String(key)} rejected`)
+                    }, `suspense value:${String(key)} rejected`);
                 }),
                 refresh: createPromise,
                 force,
                 fromServer: false,
-            }
+            };
             state[cacheKeyValue] = {
                 ...state[cacheKeyValue],
                 ...s,
-            }
+            };
             Promise.resolve().then(() => {
                 store.setState({
                     [key]: {
@@ -115,7 +115,7 @@ const getSuspense = ({
                             refresh: createPromise,
                         }
                     }
-                }, `suspense value:${String(key)} start or refresh`)
+                }, `suspense value:${String(key)} start or refresh`);
             });
             return new Promise((resolve, reject) => state[cacheKeyValue].cache.then(() => {
                 const temp = state[cacheKeyValue];
@@ -127,14 +127,21 @@ const getSuspense = ({
             }));
         }, []);
 
-        const { data, status } = useZustandStore((state) => {
-            return {
-                status: state[key][cacheKey]?.status || 'pending',
-                data: state[key][cacheKey]?.data,
+        const { data, status } = useZustandStore((s) => (
+            {
+                status: s[key][cacheKey]?.status || 'pending',
+                data: s[key][cacheKey]?.data,
             }
-        }, (a, b) => a.status === b.status && shallow(a.data, b.data));
+        ), (a, b) => a.status === b.status && shallow(a.data, b.data));
 
-        const { cache, fullfilledOnce, force, error, fromLocal, fromServer } = state[cacheKey];
+        const {
+            cache,
+            fullfilledOnce,
+            force,
+            error,
+            fromLocal,
+            fromServer
+        } = state[cacheKey];
         const { loadable, manual } = options;
 
         if (loadable && !force) {
@@ -179,10 +186,11 @@ const getSuspense = ({
                             refresh: createPromise,
                         }
                     }
-                }
-                Object.keys(computedCaches).forEach((key) => {
-                    pre[key] = computedCaches[key].action(temp);
-                    computedCaches[key].data = pre[key];
+                };
+                Object.keys(computedCaches).forEach((k) => {
+                    pre[k] = computedCaches[k].action(temp);
+                    // eslint-disable-next-line no-param-reassign
+                    computedCaches[k].data = pre[k];
                 });
                 pre[key][cacheKey] = temp[key][cacheKey];
             }
@@ -198,6 +206,7 @@ const getSuspense = ({
         if (!cache) {
             if (!manual) {
                 if (!fromLocal) {
+                    // eslint-disable-next-line @typescript-eslint/no-throw-literal
                     throw createPromise();
                 } else {
                     createPromise();
@@ -209,7 +218,7 @@ const getSuspense = ({
                 status,
                 refresh: createPromise,
                 loadScript,
-            }
+            };
         }
 
         if (fromLocal) {
@@ -219,7 +228,7 @@ const getSuspense = ({
                 status,
                 refresh: createPromise,
                 loadScript,
-            }
+            };
         }
 
         if (fullfilledOnce && !force) {
@@ -229,7 +238,7 @@ const getSuspense = ({
                 status,
                 refresh: createPromise,
                 loadScript,
-            }
+            };
         }
 
         switch (status) {
@@ -237,7 +246,7 @@ const getSuspense = ({
             case 'fullfilled': return {
                 error,
                 data,
-                status: status,
+                status,
                 refresh: createPromise,
                 loadScript,
             };
@@ -251,10 +260,10 @@ const getSuspense = ({
             status,
             refresh: createPromise,
             loadScript,
-        }
+        };
     };
 
     return useStoreSuspense;
-}
+};
 
 export default getSuspense;

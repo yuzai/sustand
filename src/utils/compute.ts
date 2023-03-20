@@ -1,4 +1,4 @@
-import { Convert } from "../types";
+import { Convert } from '../types';
 
 export default <T, S>(
     action: (state: Convert<T>) => S,

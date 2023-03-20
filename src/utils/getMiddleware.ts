@@ -11,7 +11,8 @@ const getWrapper: GetWrapper = (get: any) => (param?: any) => {
     return get();
 };
 
-//@ts-ignore
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 const getMiddleware = (func) => (_, get, api) => {
     const originGetState = api.getState;
 
@@ -24,4 +25,3 @@ const getMiddleware = (func) => (_, get, api) => {
 };
 
 export default getMiddleware;
-

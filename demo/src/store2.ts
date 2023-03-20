@@ -6,7 +6,7 @@ import create, {
     Suspensed,
     suspense,
     persist,
-    StateCreatorTs,
+    StateCreator,
     createContext,
 } from "sustand";
 
@@ -22,7 +22,7 @@ interface Store {
     suspenseV1: Suspensed<Store, string>,
 }
 
-const storeSlice: StateCreatorTs<StoreB & Store, Store> = (set, get) => ({
+const storeSlice: StateCreator<StoreB & Store, Store> = (set, get) => ({
     a: 1,
     b: 2,
     d: () => {
@@ -70,7 +70,7 @@ interface StoreB {
     suspenseV2: Suspensed<Store, number>,
 }
 
-const createSliceB:StateCreatorTs<StoreB & Store, StoreB> = (set, get) => ({
+const createSliceB:StateCreator<StoreB & Store, StoreB> = (set, get) => ({
     a: 1,
     b: 2,
     d: () => {},

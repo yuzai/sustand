@@ -6,7 +6,11 @@ export type {
 };
 
 export type Persist = {
-    <T extends {}>(create: StateCreatorMiddware<T>, options?: PersistOptions<T>): StateCreatorMiddware<T>,
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    <T extends {}>(
+        create: StateCreatorMiddware<T>,
+        options?: PersistOptions<T>
+    ): StateCreatorMiddware<T>,
 };
 
 const persist: Persist = (fn, options?) => {
@@ -17,10 +21,6 @@ const persist: Persist = (fn, options?) => {
     return result as any;
 };
 
-const wrapper = (options: PersistOptions<any>) => {
-    return (fn) => {
-        return persist(fn, options);
-    }
-}
+const wrapper = (options: PersistOptions<any>) => (fn) => persist(fn, options);
 
 export default wrapper;

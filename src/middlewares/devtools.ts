@@ -2,7 +2,11 @@ import { devtools as zustandDevtools, DevtoolsOptions } from 'zustand/middleware
 import { StateCreatorMiddware } from '../types';
 
 type Devtools = {
-    <T extends {}>(create: StateCreatorMiddware<T>, options?: DevtoolsOptions): StateCreatorMiddware<T>
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    <T extends {}>(
+        create: StateCreatorMiddware<T>,
+        options?: DevtoolsOptions
+    ): StateCreatorMiddware<T>
 };
 
 const devtools: Devtools = (
@@ -10,9 +14,7 @@ const devtools: Devtools = (
     options:DevtoolsOptions = {}
 ) => (zustandDevtools as any)(func, options);
 
-const wrapper = (options: DevtoolsOptions) => {
-    return (func) => devtools(func, options);
-}
+const wrapper = (options: DevtoolsOptions) => (func) => devtools(func, options);
 
 export default wrapper;
 

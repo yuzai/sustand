@@ -263,10 +263,6 @@ const { useStore, useStoreLoadable } = create((set, get) => ({
       // 返回 promise 即可，该值便是 userInfo 的值
       return fetch('');
     },
-    {
-      // 定义初始值，可选
-      initialValue: {},
-    }
   )
 }));
 
@@ -341,9 +337,6 @@ store.setState({
 
 // 移除监听
 unsub();
-
-// 摧毁 store (移除监听者)
-store.destroy()
 ```
 
 ### 在 actions 中返回数据
@@ -1078,5 +1071,3 @@ const { useStore, useStoreSuspense, useStoreLoadable } = create<Store>()((...a) 
     1. 衍生状态 compute
     2. Suspense 支持
     3. renderToPipeableStream 支持
-
-相信我，sustand 在各方面，都会比 zustand 更加顺手，且 suspense 的支持能够用更少的代码完成 loading 态的维护。

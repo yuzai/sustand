@@ -1,12 +1,3 @@
----
-title: 状态管理
-order: 2
-group:
-  title: 基础
----
-
-# 状态管理
-
 ## 介绍
 
  ```zustand-with-suspense``` 简称 ```sustand``` 采用 集中式的状态管理，同时 **移除了 reducer、action 等概念**，且内部状态无相互依赖，采用 react 的思维模式做状态更新，整体使用心智负担为 0。

@@ -77,7 +77,7 @@ const { state1, action1 } = useStore((state) => ({ state1: state.state1, action1
 
 当 state 改变时，均会执行该函数，如果返回的结果没有变化，则不触发当前组件的渲染，否则才会渲染当前组件。如果要在这个函数中执行计算较重的逻辑或者多个组件均要使用该结果的话，可以考虑使用下一节介绍的计算属性。
 
-### 计算属性（版本需要大于 0.2.0）
+### 计算属性
 
 在 store 中，可以这样定义一个计算属性：
 
@@ -131,7 +131,7 @@ function App() {
 }
 ```
 
-如果对应的值是计算属性(0.2.* 之后的版本支持)，那么会直接返回属性的值，并不会返回 set 该计算属性的方法，如果是 suspense 属性，等同于 useStoreSuspense(0.2.* 之后的版本支持)，具体查看使用 suspense 一节。如下：
+如果对应的值是计算属性，那么会直接返回属性的值，并不会返回 set 该计算属性的方法，如果是 suspense 属性，等同于 useStoreSuspense，具体查看使用 suspense 一节。如下：
 
 ```js
 const App = () => {
@@ -531,54 +531,24 @@ const { useStore } = create(
 );
 ```
 
-0.1.x 版本使用方法如下：建议升级。
-
-```js
-import create, { devtools } from 'zustand-with-suspense';
-
-const { useStore } = create(devtools(
-  (set, get) => (
-    count: 0,
-    setCount: () => {
-      set(
-        {
-          count: 1,
-        },
-        // 此时 set 的第二个参数，将会被作为 action name 展示在 redux-devtools 面板上
-        'setCount 1',
-        // 对于通过 const [count, setCount] = useStore('count') 拿到的返回值，会统一增加内部的 action name，包括 suspense value 对应的状态改变
-      );
-    }
-  ),
-  {
-    // 是否启动，可以根据是否生产环境进行变更
-    enable: true,
-    // redux-devtools 的 store name
-    name: 'xxx',
-    // 更多的参数可以去 DevtoolsOptions 的定义查看，最常用的就是上述两个参数
-  }
-));
-```
-
 ### subscribeWithSelector
 
-注意：0.2.x 版本之后废弃，直接进行了内置，开发者可以直接通过 store.scribeWithSelector 进行使用
+直接进行了内置，开发者可以直接通过 store.scribeWithSelector 进行使用
 
-subscribeWithSelector 中间件，增强了原本 store 中的 subscribe 方法，可以监听部分 state 的变化来触发监听器，用法如下。
+增强了原本 store 中的 subscribe 方法，可以监听部分 state 的变化来触发监听器，用法如下。
 
 ```js
-import create, { subscribeWithSelector } from 'zustand-with-suspense';
+import create from 'zustand-with-suspense';
 
-const { store } = create(subscribeWithSelector((set, get) => (
+const { store } = create((set, get) => (
   count: 0,
   setCount: () => {
     set({
       count: 1,
     })
   }
-)));
+));
 
-// 使用了该中间件后， store 会多出来一个 subscribeWithSelector 方法
 store.subscribeWithSelector(
   // 选择想要监听的属性，当属性发生变更时，就会触发 listener
   (state) => state.count,
@@ -615,24 +585,6 @@ const { useStore } = create(
     ],
   }
 );
-```
-
-0.1.x 版本使用方法如下：(ps: 建议升级，除了中间件不兼容，其他均兼容)。
-
-```js
-import create, { persist } from 'zustand-with-suspense';
-
-const { useStore } = create(persist((set, get) => ({
-
-}), {
-  name: 'test-name', // 存入 storage 中的 key，此时可以通过 storage.getItem('test-name') 获取缓存的值,
-  storage: () => sessionStorage, // 默认指向 localStorage
-  merge: (persistState, currentState) => ({
-    ...currentState,
-    ...persistState,
-  }), // 可选，缓存值与初始值的合并规则,
-  // 更多选项可以查看 PersistOptions 的定义
-}));
 ```
 
 

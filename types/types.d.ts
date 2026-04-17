@@ -1,4 +1,3 @@
-/// <reference types="react" />
 export type Status = 'pending' | 'fullfilled' | 'rejected';
 /** 初始化时对 state 的转换 */
 export type Convert<T> = {

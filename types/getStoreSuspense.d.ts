@@ -1,4 +1,3 @@
-/// <reference types="react" />
 declare const getSuspense: ({ store, useZustandStore, suspenseCaches, computedCaches, }: {
     store: any;
     useZustandStore: any;

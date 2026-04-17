@@ -1,31 +1,14 @@
-/// <reference types="react" />
 import { UseStore, UseStoreSuspense, StoreApi, Convert } from './types';
-declare const createContext: <T extends {}>(fn?: (() => T) | undefined) => {
+declare const createContext: <T extends {}>(fn?: () => T) => {
     Provider: import("react").Provider<{
-        useStore?: UseStore<T> | undefined;
-        useStoreSuspense?: UseStoreSuspense<T, {
-            args?: any;
-            manual?: boolean | undefined;
-            loadable?: boolean | undefined;
-        }> | undefined;
-        useStoreLoadable?: UseStoreSuspense<T, {
-            args?: any;
-            manual?: boolean | undefined;
-            loadable?: boolean | undefined;
-        }> | undefined;
-        store?: StoreApi<Convert<T>> | undefined;
+        useStore?: UseStore<T>;
+        useStoreSuspense?: UseStoreSuspense<T>;
+        useStoreLoadable?: UseStoreSuspense<T>;
+        store?: StoreApi<Convert<T>>;
     }>;
     useStore: UseStore<T>;
-    useStoreLoadable: UseStoreSuspense<T, {
-        args?: any;
-        manual?: boolean | undefined;
-        loadable?: boolean | undefined;
-    }>;
-    useStoreSuspense: UseStoreSuspense<T, {
-        args?: any;
-        manual?: boolean | undefined;
-        loadable?: boolean | undefined;
-    }>;
+    useStoreLoadable: UseStoreSuspense<T>;
+    useStoreSuspense: UseStoreSuspense<T>;
     getStore: () => StoreApi<Convert<T>> | undefined;
 };
 export default createContext;

@@ -19,6 +19,7 @@ import {
 import getSuspense from './getStoreSuspense';
 import collect from './utils/collet';
 import getMiddleware from './utils/getMiddleware';
+import useSelectorWithEquality from './utils/useSelectorWithEquality';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 const createSustand = <T extends {}>(
@@ -81,46 +82,54 @@ const createSustand = <T extends {}>(
         loadable: true,
     });
 
-    const useStore: UseStore<T> = (f?, equalityFn?):any => {
-        let fn = f;
-        // 比较函数默认全部 shallow
-        let isEqual = equalityFn || shallow;
-        // useStore('key') 时，将比较函数整理成仅比较 state
+    const useStore: UseStore<T> = (f?, equalityFn?): any => {
+        // 始终调用此 hook，保持 hook 顺序稳定
         const equalityFnData = useCallback((a, b) => shallow(a[0], b[0]), []);
+
+        // suspense key：完全委托给 useStoreSuspense，它有自己的 hook 子树
+        if (typeof f === 'string' && suspenseCaches[f]) {
+            return useStoreSuspense(f as FilterSuspenseKey<T>, equalityFn);
+        }
+
+        // 其余三种形式（computed key / normal key / selector 函数）统一走 selector + equality
+        let selector: any;
+        let eq: (a: any, b: any) => boolean;
+
         if (typeof f === 'string') {
             if (computedCaches[f]) {
-                return useZustandStore((state) => state[f], isEqual);
-            }
-            if (suspenseCaches[f]) {
-                return useStoreSuspense(f as FilterSuspenseKey<T>, equalityFn);
-            }
-            const state = store.getState();
-            let setState = lazySetActions[f];
-            if (!setState) {
-                // eslint-disable-next-line @typescript-eslint/ban-types
-                lazySetActions[f] = (v: Function | any) => {
-                    if (typeof v === 'function') {
-                        if (f in state) {
+                selector = (state: any) => state[f];
+                eq = equalityFn || shallow;
+            } else {
+                const state = store.getState();
+                let setState = lazySetActions[f];
+                if (!setState) {
+                    // eslint-disable-next-line @typescript-eslint/ban-types
+                    lazySetActions[f] = (v: Function | any) => {
+                        if (typeof v === 'function') {
+                            if (f in state) {
+                                store.setState({
+                                    [f]: v(store.getState()[f])
+                                } as Partial<Convert<T>>, `setState: ${f}`);
+                            }
+                        } else {
                             store.setState({
-                                [f]: v(store.getState()[f])
+                                [f]: v
                             } as Partial<Convert<T>>, `setState: ${f}`);
                         }
-                    } else {
-                        store.setState({
-                            [f]: v
-                        } as Partial<Convert<T>>, `setState: ${f}`);
-                    }
-                };
-                setState = lazySetActions[f];
+                    };
+                    setState = lazySetActions[f];
+                }
+                selector = (s: any) => [s[f], setState];
+                eq = equalityFn || equalityFnData;
             }
-            // 惰性生成 setState
-            fn = (s) => [s[f], setState];
-            isEqual = equalityFn || equalityFnData;
+        } else {
+            selector = f;
+            eq = equalityFn || shallow;
         }
-        // 使用 zustand 的 useStore 完成状态生成
-        const res = useZustandStore(fn, isEqual);
 
-        return res;
+        // 把 (selector, equalityFn) 合并成 v5 的单参数选择器
+        const memoSelector = useSelectorWithEquality(selector, eq);
+        return useZustandStore(memoSelector);
     };
 
     return {

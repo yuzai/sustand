@@ -1,7 +1,7 @@
 declare const _default: <T, S, R>(action: (...parmas: any[]) => Promise<S>, options?: {
-    selector?: ((state: T) => R) | undefined;
-    initialValue?: S | undefined;
-    equalityFn?: ((a: R, b: R) => boolean) | undefined;
+    selector?: (state: T) => R;
+    initialValue?: S;
+    equalityFn?: (a: R, b: R) => boolean;
 }) => {
     action: (...parmas: any[]) => Promise<S>;
     selector: ((state: T) => R) | undefined;

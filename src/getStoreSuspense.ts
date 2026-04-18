@@ -1,5 +1,6 @@
 import { useCallback, useRef, createElement } from 'react';
 import { shallow } from 'zustand/shallow';
+import useSelectorWithEquality from './utils/useSelectorWithEquality';
 
 const getSuspense = ({
     store,
@@ -127,12 +128,14 @@ const getSuspense = ({
             }));
         }, []);
 
-        const { data, status } = useZustandStore((s) => (
-            {
+        const memoSel = useSelectorWithEquality(
+            (s: any) => ({
                 status: s[key][cacheKey]?.status || 'pending',
                 data: s[key][cacheKey]?.data,
-            }
-        ), (a, b) => a.status === b.status && shallow(a.data, b.data));
+            }),
+            (a: any, b: any) => a.status === b.status && shallow(a.data, b.data)
+        );
+        const { data, status } = useZustandStore(memoSel);
 
         const {
             cache,

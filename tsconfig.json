@@ -39,6 +39,7 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
+    "skipLibCheck": true,
 
     "jsx": "react-jsx",
     "target": "es6",

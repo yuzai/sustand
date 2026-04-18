@@ -6,6 +6,24 @@
 
 同时状态库支持 ```suspense``` 的用法，可以方便的管理 loading 态，向更好的用户体验迈进
 
+## 从 0.0.x 升级到 1.0.0
+
+1.0.0 对齐了 zustand v5。对用户而言，sustand 自身的 API **完全没有破坏性变更**，`useStore(selector, equalityFn?)`、`useStore('key')`、`create`、`compute`、`suspense`、`createContext` 用法都保持不变。
+
+需要关心的只有依赖层面：
+
+- **zustand 升到 v5**：sustand 的 peer 现在是 `zustand@^5`。如果你的项目里也直接装了 zustand，同步升级即可
+- **React 需要 ≥ 18**：zustand v5 内部切到 `useSyncExternalStore`，不再兼容 React 17
+- **TypeScript 仍要求 ≥ 4.5**（未变，因为类型层用了 `Awaited`）
+
+sustand 内部把 `(selector, equalityFn)` 合并成了"自带记忆的单参数选择器"来适配 v5 的 `useStore` 新 API，外部写法保持原样即可：
+
+```js
+// 0.0.x / 1.0.0 写法完全一致
+const [a, b] = useStore((state) => [state.a, state.b]); // 默认 shallow
+const v = useStore((state) => state.a + state.b, Object.is); // 自定义比较
+```
+
 ## 基本用法
 
 ### 第一步：创建一个 store
